@@ -1,0 +1,22 @@
+{
+  "name": "linkedin-icebreaker-messages",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/client/*",
+    "apps/server/*",
+    "domain/*",
+    "features/*",
+    "resources/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+  }
+}
