@@ -32,5 +32,6 @@
 				"ms-vscode-remote.remote-containers"
 			]
 		}
-	}
+	},
+	"forwardPorts": [5173, 3001]
 }

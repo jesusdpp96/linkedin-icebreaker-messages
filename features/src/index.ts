@@ -1,0 +1,1 @@
+export { DomainTestInterface } from "./test-interface"
