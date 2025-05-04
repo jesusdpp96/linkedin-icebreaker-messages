@@ -11,8 +11,9 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build -w @linkedin-icebreaker-messages/domain && npm run build -w @linkedin-icebreaker-messages/app-client",
-    "dev": "npm run dev -w @linkedin-icebreaker-messages/app-client"
+    "build": "npm run build -w @linkedin-icebreaker-messages/domain && npm run build -w @linkedin-icebreaker-messages/app-client && npm run build -w @linkedin-icebreaker-messages/app-server",
+    "dev:client": "npm run dev -w @linkedin-icebreaker-messages/app-client",
+    "dev:server": "npm run dev -w @linkedin-icebreaker-messages/app-server"
   },
   "keywords": [],
   "author": "",

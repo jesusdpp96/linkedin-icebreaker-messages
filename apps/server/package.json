@@ -2,14 +2,15 @@
   "name": "@linkedin-icebreaker-messages/app-server",
   "version": "1.0.0",
   "description": "A server application built with TypeScript and Express.js, serving as a Node.js starter template.",
-  "main": "dist/main.js",
+  "main": "dist/server.js",
+  "type": "module",
   "author": "jesusdpp96@gmail.com",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "dev": "nodemon",
+    "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" nodemon",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc.json src/**/*.ts --write",
-    "start": "node dist/main.js",
+    "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
@@ -28,6 +29,7 @@
     "typescript": "~4.9.3"
   },
   "dependencies": {
+    "@linkedin-icebreaker-messages/domain": "*",
     "cors": "~2.8.5",
     "dotenv": "~16.5.0",
     "eslint-plugin-import": "~2.26.0",

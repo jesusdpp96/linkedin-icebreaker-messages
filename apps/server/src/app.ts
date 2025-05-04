@@ -1,6 +1,6 @@
 import express from 'express'
-import { corsMiddleware } from './middlewares/cors.middleware'
-import healthRouter from './routes/health.route'
+import { corsMiddleware } from './middlewares/cors.middleware.js'
+import healthRouter from './routes/health.route.js'
 
 const app = express()
 
