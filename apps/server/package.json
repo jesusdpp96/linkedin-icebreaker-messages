@@ -1,7 +1,7 @@
 {
-  "name": "result-driver",
+  "name": "@linkedin-icebreaker-messages/app-server",
   "version": "1.0.0",
-  "description": "Node JS and Typescript starter template",
+  "description": "A server application built with TypeScript and Express.js, serving as a Node.js starter template.",
   "main": "dist/main.js",
   "author": "jesusdpp96@gmail.com",
   "scripts": {
