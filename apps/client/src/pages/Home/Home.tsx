@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Container, Typography, Button, Box } from "@mui/material";
 import { Layout } from "../../components";
 
+import { DomainTestInterface } from "@linkedin-icebreaker-messages/domain";
+
 export const Home = () => {
   // State for the counter
   const [count, setCount] = useState(0);
@@ -19,7 +21,8 @@ export const Home = () => {
   const fetchHealthStatus = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:3000/api/health");
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${apiUrl}/health`);
       if (response.ok) {
         const data = await response.json();
         setHealthStatus(data.status || "Healthy");

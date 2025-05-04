@@ -11,12 +11,11 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build --workspaces",
-    "lint": "npm run lint --workspaces"
+    "build": "npm run build -w @linkedin-icebreaker-messages/domain && npm run build -w @linkedin-icebreaker-messages/app-client",
+    "dev": "npm run dev -w @linkedin-icebreaker-messages/app-client"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-  }
+  "dependencies": {}
 }
