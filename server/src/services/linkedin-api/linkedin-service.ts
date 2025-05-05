@@ -15,9 +15,9 @@ export class LinkedInService {
   }
 
   /**
-   * Obtiene datos del perfil de LinkedIn a través de la URL
-   * @param url URL del perfil de LinkedIn (debe estar codificada)
-   * @returns Datos del perfil
+   * Retrieves LinkedIn profile data through the URL
+   * @param url LinkedIn profile URL (must be encoded)
+   * @returns Profile data
    * @example
    * const profileData = await linkedInService.getProfileDataByUrl('https%3A%2F%2Fwww.linkedin.com%2Fin%2Fadamselipsky%2F');
    */
@@ -30,13 +30,13 @@ export class LinkedInService {
   }
 
   /**
-   * Obtiene las publicaciones de un perfil de LinkedIn
-   * @param username Nombre de usuario del perfil
-   * @param options Opciones adicionales como start, paginationToken y postedAt
-   * @returns Publicaciones del perfil
+   * Retrieves posts from a LinkedIn profile
+   * @param username Profile username
+   * @param options Additional options such as start, paginationToken, and postedAt
+   * @returns Profile posts
    * @example
    * const posts = await linkedInService.getProfilePosts('adamselipsky');
-   * // Con paginación
+   * // With pagination
    * const morePosts = await linkedInService.getProfilePosts('adamselipsky', {
    *   start: '50',
    *   paginationToken: 'token-from-previous-call'
@@ -59,10 +59,10 @@ export class LinkedInService {
   }
 
   /**
-   * Obtiene las reacciones de un perfil de LinkedIn
-   * @param username Nombre de usuario del perfil
-   * @param options Opciones adicionales como start y paginationToken
-   * @returns Reacciones del perfil
+   * Retrieves reactions from a LinkedIn profile
+   * @param username Profile username
+   * @param options Additional options such as start and paginationToken
+   * @returns Profile reactions
    * @example
    * const reactions = await linkedInService.getProfileReactions('adamselipsky');
    */
@@ -82,9 +82,9 @@ export class LinkedInService {
   }
 
   /**
-   * Obtiene los comentarios de un perfil de LinkedIn
-   * @param username Nombre de usuario del perfil
-   * @returns Comentarios del perfil
+   * Retrieves comments from a LinkedIn profile
+   * @param username Profile username
+   * @returns Profile comments
    * @example
    * const comments = await linkedInService.getProfileComments('williamhgates');
    */
