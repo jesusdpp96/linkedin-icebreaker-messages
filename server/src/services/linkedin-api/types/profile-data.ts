@@ -80,6 +80,34 @@ export interface SupportedLocale {
   language: string
 }
 
+export interface PartialDate {
+  year: number
+  month: number
+  day: number
+}
+
+// Represents a company's profile
+export interface CertificationCompany {
+  name: string
+  universalName: string
+  logo: string
+  staffCountRange: Record<string, unknown>
+  headquarter: Record<string, unknown>
+}
+
+// Represents a certification with relevant metadata
+export interface Certification {
+  name: string
+  start: PartialDate
+  end: PartialDate
+  authority: string
+  company: CertificationCompany
+  timePeriod: {
+    start: PartialDate
+    end: PartialDate
+  }
+}
+
 // Main LinkedIn Profile type
 export interface ProfileData {
   id: number
@@ -104,6 +132,7 @@ export interface ProfileData {
   multiLocaleFirstName: MultiLocaleText
   multiLocaleLastName: MultiLocaleText
   multiLocaleHeadline: MultiLocaleText
+  certifications: Certification[]
 }
 
 export type ProfileDataResponse = ProfileData | { success: false; message: string; data: null }
