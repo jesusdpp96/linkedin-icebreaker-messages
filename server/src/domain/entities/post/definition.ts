@@ -13,7 +13,7 @@ export class Post implements PrimitiveMethod<Payload> {
     public id: number,
     public postedContent: string,
     public publicationUrl: string,
-    public postedDate: Date,
+    public postedDate: string,
     public authorUsername: string,
     public hasMediaContent: boolean,
   ) {

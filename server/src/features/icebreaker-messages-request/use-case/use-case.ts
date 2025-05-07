@@ -23,9 +23,11 @@ export class UseCase {
     /**
      * Build Request
      */
+    console.log(`uc-1`)
     const requestResult = this.service.getRequest(input)
     if (requestResult.err) {
       this.presenter.showRequestError(requestResult.val)
+      console.log(`uc-2`)
       return
     }
     const request = requestResult.val
@@ -38,12 +40,15 @@ export class UseCase {
       senderProfilePromise,
       receiverProfilePromise,
     ])
+    console.log(`uc-3`)
     if (senderProfileResult.err) {
       this.presenter.showSenderProfileError(senderProfileResult.val)
+      console.log(`uc-4`)
       return
     }
     if (receiverProfileResult.err) {
       this.presenter.showReceiverProfileError(receiverProfileResult.val)
+      console.log(`uc-5`)
       return
     }
     const senderProfile = senderProfileResult.val
@@ -55,6 +60,7 @@ export class UseCase {
      *  - sender comments
      *  - receiver reactions
      */
+    console.log(`uc-6`)
     const senderPostsPromise = this.service.getLinkedinPosts(senderProfile)
     const receiverPostsPromise = this.service.getLinkedinPosts(receiverProfile)
     const senderCommentsPromise = this.service.getLinkedinSenderComments(senderProfile)
@@ -72,26 +78,32 @@ export class UseCase {
     ])
     if (senderPostsResult.err) {
       this.presenter.showSenderPostsError(senderPostsResult.val)
+      console.log(`uc-7`)
       return
     }
     if (receiverPostsResult.err) {
       this.presenter.showReceiverPostsError(receiverPostsResult.val)
+      console.log(`uc-8`)
       return
     }
     if (senderCommentsResult.err) {
       this.presenter.showSenderCommentsError(senderCommentsResult.val)
+      console.log(`uc-9`)
       return
     }
     if (receiverReactionsResult.err) {
       this.presenter.showReceiverReactionsError(receiverReactionsResult.val)
+      console.log(`uc-10`)
       return
     }
     /**
      * Getting messages templates
      */
+    console.log(`uc-11`)
     const messagesTemplatesResult = await this.repository.getMessagesTemplate()
     if (messagesTemplatesResult.err) {
       this.presenter.showMessagesTemplateError(messagesTemplatesResult.val)
+      console.log(`uc-12`)
       return
     }
     /**
@@ -105,6 +117,7 @@ export class UseCase {
     const senderComments = senderCommentsResult.val
     const receiverReactions = receiverReactionsResult.val
 
+    console.log(`uc-13`)
     try {
       // Convertimos todos los objetos a primitivos para facilitar su serialización
       const senderProfilePrimitive = senderProfile.toPrimitive()
@@ -170,11 +183,14 @@ export class UseCase {
         solution,
       )
 
+      console.log(`uc-14`)
       // Enviamos el prompt a la IA con todos los datos adjuntos
       const aiResponseResult = await this.service.askToAI(prompt, dataAttachments)
 
+      console.log(`uc-15`)
       if (aiResponseResult.err) {
         this.presenter.showAIError(aiResponseResult.val)
+        console.log(`uc-16`)
         return
       }
 
@@ -185,6 +201,7 @@ export class UseCase {
       let icebreakers: any[] = []
       const icebreakersInstances: IcebreakerMessage[] = []
       try {
+        console.log(`uc-17`)
         icebreakers = JSON.parse(aiResponse)
 
         // Validamos que tengamos exactamente 3 mensajes
@@ -208,6 +225,7 @@ export class UseCase {
           icebreakersInstances.push(icebreakerMessage.val)
         }
       } catch (error) {
+        console.log(`uc-18`)
         // Si hay problemas con el formato de la respuesta, intentamos con un prompt más explícito
         const fixPromptStr = fixPrompt()
 
@@ -219,6 +237,7 @@ export class UseCase {
         }
 
         try {
+          console.log(`uc-19`)
           icebreakers = JSON.parse(fixResult.val)
 
           if (!Array.isArray(icebreakers) || icebreakers.length !== 3) {
@@ -243,6 +262,7 @@ export class UseCase {
           this.presenter.showAIError(
             new Error('No se pudo obtener una respuesta válida de la IA'),
           )
+          console.log(`uc-20`)
           return
         }
       }

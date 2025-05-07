@@ -39,7 +39,7 @@ export class Driver implements ServiceDriverPort {
       lastName: profileData.lastName || '',
       profilePicture: profileData.profilePicture || '',
       headline: profileData.headline || '',
-      summary: profileData.summary || '',
+      summary: (profileData.summary || '').slice(0, 800),
       certifications: (profileData.certifications || []).map(certification => ({
         year: certification?.start?.year,
         name: certification.name,
@@ -47,9 +47,6 @@ export class Driver implements ServiceDriverPort {
       })),
       lastPosition,
     }
-
-    profile.summary =
-      profile.summary.length > 500 ? profile.summary.substring(0, 500) : profile.summary
 
     return Ok(profile)
   }
@@ -59,17 +56,19 @@ export class Driver implements ServiceDriverPort {
       return Err(new Error(posts.message))
     }
     const postsData = posts.data
-    const postsPayload: PostPayload[] = (postsData || []).map(post => {
-      this.postsCounter++
-      return {
-        id: this.postsCounter,
-        postedContent: post.text,
-        publicationUrl: post.postUrl,
-        postedDate: new Date(post.postedAt),
-        authorUsername: username,
-        hasMediaContent: (post.image || []).length > 0,
-      }
-    })
+    const postsPayload: PostPayload[] = (postsData || [])
+      .map(post => {
+        this.postsCounter++
+        return {
+          id: this.postsCounter,
+          postedContent: (post.text || '').slice(0, 1000),
+          publicationUrl: post.postUrl,
+          postedDate: post.postedAt,
+          authorUsername: username,
+          hasMediaContent: (post.image || []).length > 0,
+        }
+      })
+      .filter(elem => elem.postedContent.length > 0)
 
     return Ok(postsPayload)
   }
@@ -79,16 +78,15 @@ export class Driver implements ServiceDriverPort {
       return Err(new Error(comments.message))
     }
     const commentsData = comments.data
-    const commentsPayload: SenderCommentPayload[] = (commentsData || []).map(
-      (comment, index) => ({
-        id: index,
+    const commentsPayload: SenderCommentPayload[] = (commentsData || [])
+      .map((comment, index) => ({
+        id: index + 1,
         authorUsername: username,
-        commentedContent: (comment.highlightedComments || []).join(' '),
+        commentedContent: (comment.highlightedComments || []).join(' ').slice(0, 500).trim(),
         commentedInPublicationUrl: comment.postUrl,
-        commentDate: new Date(comment.postedAt),
-      }),
-    )
-
+        commentDate: comment.postedAt,
+      }))
+      .filter(elem => elem.commentedContent.length > 0)
     return Ok(commentsPayload)
   }
   public async getReactions(
@@ -99,14 +97,14 @@ export class Driver implements ServiceDriverPort {
       return Err(new Error(reactions.message))
     }
     const reactionsData = reactions.data?.items || []
-    const reactionsPayload: ReceiverReactionPayload[] = (reactionsData || []).map(
-      (reaction, index) => ({
-        id: index,
+    const reactionsPayload: ReceiverReactionPayload[] = (reactionsData || [])
+      .map((reaction, index) => ({
+        id: index + 1,
         reactionByUsername: username,
-        reactedToContent: reaction.text,
+        reactedToContent: (reaction.text || '').slice(0, 1000),
         reaction: reaction.action,
-      }),
-    )
+      }))
+      .filter(elem => elem.reactedToContent.length > 0)
 
     return Ok(reactionsPayload)
   }

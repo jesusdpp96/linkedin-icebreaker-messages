@@ -5,8 +5,8 @@ const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
 export const conditions = z.object({
   id: z.number().int().min(1),
   username: z.string().min(1).max(255),
-  firstName: z.string().min(1).max(255),
-  lastName: z.string().min(1).max(255),
+  firstName: z.string().max(255),
+  lastName: z.string().max(255),
   profilePicture: z.string().regex(urlRegex, 'profile-invalid-url'),
   headline: z.string(),
   summary: z.string(),

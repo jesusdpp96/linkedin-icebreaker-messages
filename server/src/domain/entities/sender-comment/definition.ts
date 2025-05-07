@@ -12,7 +12,7 @@ export class SenderComment implements PrimitiveMethod<Payload> {
     public id: number,
     public commentedContent: string,
     public commentedInPublicationUrl: string,
-    public commentDate: Date,
+    public commentDate: string,
     public authorUsername: string,
   ) {
     // empty
