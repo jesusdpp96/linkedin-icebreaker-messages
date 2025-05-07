@@ -1,2 +1,2 @@
-export { Payload as EmisorCommentPayload } from './payload'
-export { EmisorComment } from './definition'
+export { Payload as ReceiverReactionPayload } from './payload'
+export { ReceiverReaction } from './definition'

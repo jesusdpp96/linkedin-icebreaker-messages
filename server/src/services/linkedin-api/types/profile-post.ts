@@ -10,6 +10,12 @@ export interface ProfilePostsResponse {
   paginationToken: string
 }
 
+export interface Image {
+  url: string
+  width: number
+  height: number
+}
+
 // LinkedIn Post Type
 export interface ProfilePost {
   isBrandPartnership: boolean
@@ -38,6 +44,7 @@ export interface ProfilePost {
   entity: Record<string, unknown>
   mentions?: Mention[]
   companyMentions?: CompanyMention[]
+  image?: Image[]
 }
 
 // LinkedIn Author Type

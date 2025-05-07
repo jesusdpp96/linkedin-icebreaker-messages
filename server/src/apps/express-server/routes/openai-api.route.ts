@@ -36,16 +36,22 @@
  */
 import type { Request, Response } from 'express'
 import { Router } from 'express'
-import { OpenAIChatService } from '@services/openai-api/openai-service'
+import { OpenAIChatService } from '@services'
 import { config } from '../config'
 
 const router = Router()
 
 router.get('/openai-api', async (req: Request, res: Response) => {
   const apiKey = config.OPENAI_API_KEY
+  const model = config.OPENAI_MODEL
 
   if (!apiKey) {
     res.status(500).json({ status: 'error', message: 'Missing OpenAI API key in config.' })
+    return
+  }
+
+  if (!model) {
+    res.status(500).json({ status: 'error', message: 'Missing OpenAI model in config.' })
     return
   }
 
@@ -57,7 +63,7 @@ router.get('/openai-api', async (req: Request, res: Response) => {
     return
   }
 
-  const openaiService = new OpenAIChatService({ apiKey })
+  const openaiService = new OpenAIChatService({ apiKey, model })
 
   try {
     const jsonInputs = json ? [json] : undefined

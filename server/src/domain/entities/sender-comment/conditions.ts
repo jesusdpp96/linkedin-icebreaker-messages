@@ -6,6 +6,6 @@ export const conditions = z.object({
   id: z.number().int().min(1),
   commentedContent: z.string().max(1500),
   commentedInPublicationUrl: z.string().regex(urlRegex, 'post-invalid-url'),
-  commentDate: z.date(),
+  commentDate: z.string(),
   authorUsername: z.string().min(1).max(255),
 })
