@@ -110,6 +110,7 @@ export interface Certification {
 
 // Main LinkedIn Profile type
 export interface ProfileData {
+  success: undefined
   id: number
   urn: string
   username: string

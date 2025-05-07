@@ -19,7 +19,7 @@
  */
 import type { Request, Response } from 'express'
 import { Router } from 'express'
-import { LinkedInService } from '@services/linkedin-api'
+import { LinkedInService } from '@services'
 import { config } from '../config'
 
 const router = Router()

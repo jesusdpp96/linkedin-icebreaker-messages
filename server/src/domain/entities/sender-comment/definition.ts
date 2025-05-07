@@ -1,6 +1,6 @@
 import type { Result } from 'ts-results'
 import { Err, Ok } from 'ts-results'
-import type { PrimitiveMethod } from '@domain/base'
+import type { PrimitiveMethod } from '../../base'
 import { conditions } from './conditions'
 import type { Payload } from './payload'
 
