@@ -2,10 +2,10 @@ import type { IcebreakerMessagePayload } from '@domain'
 
 export interface DriverPort {
   // errors
-  badRequestError(error: Error): void
-  linkedinApiError(error: Error): void
-  unknownError(error: Error): void
-  aiError(error: Error): void
+  badRequestError(name: string, error: Error): void
+  linkedinApiError(name: string, error: Error): void
+  unknownError(name: string, error: Error): void
+  aiError(name: string, error: Error): void
 
   // success
   show(messages: IcebreakerMessagePayload[]): void

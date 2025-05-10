@@ -6,6 +6,7 @@ export class Driver implements PresenterDriverPort {
   public error!: Error | undefined
   public isError!: boolean
   public source!: string | undefined
+  public name!: string | undefined
   public code!: number
   public data!: IcebreakerMessagePayload[] | undefined
 
@@ -13,33 +14,37 @@ export class Driver implements PresenterDriverPort {
     // empty
   }
 
-  public badRequestError(error: Error): void {
+  public badRequestError(name: string, error: Error): void {
     this.error = error
     this.isError = true
     this.source = 'BadRequest'
     this.code = 400
+    this.name = name
     this.data = undefined
   }
 
-  public linkedinApiError(error: Error): void {
+  public linkedinApiError(name: string, error: Error): void {
     this.error = error
     this.isError = true
     this.source = 'LinkedInApi'
     this.code = 500
+    this.name = name
     this.data = undefined
   }
-  unknownError(error: Error): void {
+  unknownError(name: string, error: Error): void {
     this.error = error
     this.source = 'Unknown'
     this.isError = true
     this.code = 500
+    this.name = name
     this.data = undefined
   }
-  aiError(error: Error): void {
+  aiError(name: string, error: Error): void {
     this.error = error
     this.source = 'AI'
     this.isError = true
     this.code = 500
+    this.name = name
     this.data = undefined
   }
 

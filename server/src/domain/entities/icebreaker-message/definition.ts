@@ -14,6 +14,12 @@ export class IcebreakerMessage implements PrimitiveMethod<Payload> {
     public templateCategory: string,
     public instruction: string,
     public sourcePosts: string[],
+    public receiverName: string,
+    public receiverProfilePicture: string,
+    public receiverHeadline: string,
+    public senderName: string,
+    public senderProfilePicture: string,
+    public senderHeadline: string,
   ) {
     // empty
   }
@@ -37,6 +43,12 @@ export class IcebreakerMessage implements PrimitiveMethod<Payload> {
         parse.data.templateCategory,
         parse.data.instruction,
         parse.data.sourcePosts,
+        parse.data.receiverName,
+        parse.data.receiverProfilePicture,
+        parse.data.receiverHeadline,
+        parse.data.senderName,
+        parse.data.senderProfilePicture,
+        parse.data.senderHeadline,
       ),
     )
   }
@@ -48,6 +60,12 @@ export class IcebreakerMessage implements PrimitiveMethod<Payload> {
       templateCategory: this.templateCategory,
       instruction: this.instruction,
       sourcePosts: this.sourcePosts,
+      receiverName: this.receiverName,
+      receiverProfilePicture: this.receiverProfilePicture,
+      receiverHeadline: this.receiverHeadline,
+      senderName: this.senderName,
+      senderProfilePicture: this.senderProfilePicture,
+      senderHeadline: this.senderHeadline,
     }
   }
 }

@@ -23,11 +23,9 @@ export class UseCase {
     /**
      * Build Request
      */
-    console.log(`uc-1`)
     const requestResult = this.service.getRequest(input)
     if (requestResult.err) {
       this.presenter.showRequestError(requestResult.val)
-      console.log(`uc-2`)
       return
     }
     const request = requestResult.val
@@ -40,15 +38,12 @@ export class UseCase {
       senderProfilePromise,
       receiverProfilePromise,
     ])
-    console.log(`uc-3`)
     if (senderProfileResult.err) {
       this.presenter.showSenderProfileError(senderProfileResult.val)
-      console.log(`uc-4`)
       return
     }
     if (receiverProfileResult.err) {
       this.presenter.showReceiverProfileError(receiverProfileResult.val)
-      console.log(`uc-5`)
       return
     }
     const senderProfile = senderProfileResult.val
@@ -60,7 +55,6 @@ export class UseCase {
      *  - sender comments
      *  - receiver reactions
      */
-    console.log(`uc-6`)
     const senderPostsPromise = this.service.getLinkedinPosts(senderProfile)
     const receiverPostsPromise = this.service.getLinkedinPosts(receiverProfile)
     const senderCommentsPromise = this.service.getLinkedinSenderComments(senderProfile)
@@ -78,32 +72,26 @@ export class UseCase {
     ])
     if (senderPostsResult.err) {
       this.presenter.showSenderPostsError(senderPostsResult.val)
-      console.log(`uc-7`)
       return
     }
     if (receiverPostsResult.err) {
       this.presenter.showReceiverPostsError(receiverPostsResult.val)
-      console.log(`uc-8`)
       return
     }
     if (senderCommentsResult.err) {
       this.presenter.showSenderCommentsError(senderCommentsResult.val)
-      console.log(`uc-9`)
       return
     }
     if (receiverReactionsResult.err) {
       this.presenter.showReceiverReactionsError(receiverReactionsResult.val)
-      console.log(`uc-10`)
       return
     }
     /**
      * Getting messages templates
      */
-    console.log(`uc-11`)
     const messagesTemplatesResult = await this.repository.getMessagesTemplate()
     if (messagesTemplatesResult.err) {
       this.presenter.showMessagesTemplateError(messagesTemplatesResult.val)
-      console.log(`uc-12`)
       return
     }
     /**
@@ -117,9 +105,8 @@ export class UseCase {
     const senderComments = senderCommentsResult.val
     const receiverReactions = receiverReactionsResult.val
 
-    console.log(`uc-13`)
     try {
-      // Convertimos todos los objetos a primitivos para facilitar su serialización
+      // Convert all objects to primitives to facilitate serialization
       const senderProfilePrimitive = senderProfile.toPrimitive()
       const receiverProfilePrimitive = receiverProfile.toPrimitive()
       senderProfilePrimitive.profilePicture = this.shortenLink(
@@ -130,19 +117,19 @@ export class UseCase {
       )
       const senderPostsPrimitive = senderPosts.map(post => {
         const postPrimitive = post.toPrimitive()
-        // Acortamos los links de las publicaciones
+        // Shorten the links of the posts
         postPrimitive.publicationUrl = this.shortenLink(postPrimitive.publicationUrl)
         return postPrimitive
       })
       const receiverPostsPrimitive = receiverPosts.map(post => {
         const postPrimitive = post.toPrimitive()
-        // Acortamos los links de las publicaciones
+        // Shorten the links of the posts
         postPrimitive.publicationUrl = this.shortenLink(postPrimitive.publicationUrl)
         return postPrimitive
       })
       const senderCommentsPrimitive = senderComments.map(comment => {
         const commentPrimitive = comment.toPrimitive()
-        // Acortamos los links de los comentarios
+        // Shorten the links of the comments
         commentPrimitive.commentedInPublicationUrl = this.shortenLink(
           commentPrimitive.commentedInPublicationUrl,
         )
@@ -154,7 +141,7 @@ export class UseCase {
       const messagesTemplatesPrimitive = messagesTemplates.map(template =>
         template.toPrimitive(),
       )
-      // Preparamos los datos para adjuntar al prompt
+      // Prepare the data to attach to the prompt
       const dataAttachments = [
         JSON.stringify({
           senderProfile: senderProfilePrimitive,
@@ -171,7 +158,7 @@ export class UseCase {
         }),
       ]
 
-      // Construimos un prompt detallado para la IA
+      // Build a detailed prompt for the AI
       const prompt = firstPrompt(
         senderProfilePrimitive.firstName,
         senderProfilePrimitive.lastName,
@@ -183,50 +170,59 @@ export class UseCase {
         solution,
       )
 
-      console.log(`uc-14`)
-      // Enviamos el prompt a la IA con todos los datos adjuntos
+      // Send the prompt to the AI with all the attached data
       const aiResponseResult = await this.service.askToAI(prompt, dataAttachments)
 
-      console.log(`uc-15`)
       if (aiResponseResult.err) {
         this.presenter.showAIError(aiResponseResult.val)
-        console.log(`uc-16`)
         return
       }
 
       const aiResponse = aiResponseResult.val
 
-      // Parseamos la respuesta para obtener los mensajes generados
+      // Parse the response to obtain the generated messages
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let icebreakers: any[] = []
       const icebreakersInstances: IcebreakerMessage[] = []
       try {
-        console.log(`uc-17`)
         icebreakers = JSON.parse(aiResponse)
 
-        // Validamos que tengamos exactamente 3 mensajes
+        // Validate that we have exactly 3 messages
         if (!Array.isArray(icebreakers) || icebreakers.length !== 3) {
-          throw new Error('La respuesta de la IA no contiene exactamente 3 mensajes')
+          throw new Error('The AI response does not contain exactly 3 messages')
         }
 
-        // Validamos la estructura de cada mensaje
+        // Validate the structure of each message
         for (let index = 0; index < icebreakers.length; index++) {
           const message = icebreakers[index]
           if (message?.sourcePosts) {
-            // Desacortamos los links de las publicaciones
+            // Unshorten the links of the posts
             message.sourcePosts = message.sourcePosts.map((link: string) =>
               this.getShortedLink(link),
             )
           }
+          if (message) {
+            message.receiverName =
+              `${receiverProfilePrimitive.firstName} ${receiverProfilePrimitive.lastName}`.trim()
+            message.receiverProfilePicture = this.getShortedLink(
+              receiverProfilePrimitive.profilePicture,
+            )
+            message.receiverHeadline = receiverProfilePrimitive.headline
+            message.senderName =
+              `${senderProfilePrimitive.firstName} ${senderProfilePrimitive.lastName}`.trim()
+            message.senderProfilePicture = this.getShortedLink(
+              senderProfilePrimitive.profilePicture,
+            )
+            message.senderHeadline = senderProfilePrimitive.headline
+          }
           const icebreakerMessage = IcebreakerMessage.of(message)
           if (icebreakerMessage.err) {
-            throw new Error(`El mensaje ${index + 1} no tiene la estructura esperada`)
+            throw new Error(`Message ${index + 1} does not have the expected structure`)
           }
           icebreakersInstances.push(icebreakerMessage.val)
         }
       } catch (error) {
-        console.log(`uc-18`)
-        // Si hay problemas con el formato de la respuesta, intentamos con un prompt más explícito
+        // If there are issues with the response format, try with a more explicit prompt
         const fixPromptStr = fixPrompt()
 
         const fixResult = await this.service.askToAI(fixPromptStr, [aiResponse])
@@ -237,37 +233,47 @@ export class UseCase {
         }
 
         try {
-          console.log(`uc-19`)
           icebreakers = JSON.parse(fixResult.val)
 
           if (!Array.isArray(icebreakers) || icebreakers.length !== 3) {
-            throw new Error('La respuesta de la IA no contiene exactamente 3 mensajes')
+            throw new Error('The AI response does not contain exactly 3 messages')
           }
 
           for (let index = 0; index < icebreakers.length; index++) {
             const message = icebreakers[index]
             if (message?.sourcePosts) {
-              // Desacortamos los links de las publicaciones
+              // Unshorten the links of the posts
               message.sourcePosts = message.sourcePosts.map((link: string) =>
                 this.getShortedLink(link),
               )
             }
+            if (message) {
+              message.receiverName =
+                `${receiverProfilePrimitive.firstName} ${receiverProfilePrimitive.lastName}`.trim()
+              message.receiverProfilePicture = this.getShortedLink(
+                receiverProfilePrimitive.profilePicture,
+              )
+              message.receiverHeadline = receiverProfilePrimitive.headline
+              message.senderName =
+                `${senderProfilePrimitive.firstName} ${senderProfilePrimitive.lastName}`.trim()
+              message.senderProfilePicture = this.getShortedLink(
+                senderProfilePrimitive.profilePicture,
+              )
+              message.senderHeadline = senderProfilePrimitive.headline
+            }
             const icebreakerMessage = IcebreakerMessage.of(message)
             if (icebreakerMessage.err) {
-              throw new Error(`El mensaje ${index + 1} no tiene la estructura esperada`)
+              throw new Error(`Message ${index + 1} does not have the expected structure`)
             }
             icebreakersInstances.push(icebreakerMessage.val)
           }
         } catch (error) {
-          this.presenter.showAIError(
-            new Error('No se pudo obtener una respuesta válida de la IA'),
-          )
-          console.log(`uc-20`)
+          this.presenter.showAIError(new Error('Could not obtain a valid response from the AI'))
           return
         }
       }
 
-      // Mostramos los resultados al usuario
+      // Show the results to the user
       this.presenter.showIcebreakerMessages(icebreakersInstances)
     } catch (error) {
       this.presenter.showUnexpectedError(error as Error)

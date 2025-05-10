@@ -37,12 +37,12 @@ const UserInputSummary: React.FC<UserInputSummaryProps> = ({
           Enlace tu LinkedIn
         </Typography>
         <Link
-          href={data.senderProfileUrl}
+          href={data.senderUrl}
           target="_blank"
           rel="noopener noreferrer"
           sx={{ display: "block", mb: 2, wordBreak: "break-all" }}
         >
-          {data.senderProfileUrl}
+          {data.senderUrl}
         </Link>
 
         <Divider sx={{ my: 2 }} />
@@ -71,12 +71,12 @@ const UserInputSummary: React.FC<UserInputSummaryProps> = ({
           El url de LinkedIn de tu objetivo:
         </Typography>
         <Link
-          href={data.receiverProfileUrl}
+          href={data.receiverUrl}
           target="_blank"
           rel="noopener noreferrer"
           sx={{ display: "block", mb: 2, wordBreak: "break-all" }}
         >
-          {data.receiverProfileUrl}
+          {data.receiverUrl}
         </Link>
       </Box>
 

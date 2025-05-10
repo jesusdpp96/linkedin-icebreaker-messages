@@ -1,4 +1,4 @@
-import type { CardData, ApiResponse, FormData } from "../types";
+import type { CardData, FormData, ShowMessages } from "../types";
 
 // Sample data for the carousel cards
 export const getSampleCards = (): CardData[] => [
@@ -74,7 +74,7 @@ export const getSampleCards = (): CardData[] => [
 
   // Template 5: Felicitar por nuevo rol
   {
-    cardColor: "#00BCD4", // Cyan
+    cardColor: "#5072a1", // dark cyan
     messageCategory: "Felicitación",
     titleCategory: "Felicitar por nuevo rol",
     linkedinSimulationMessage: {
@@ -182,7 +182,7 @@ export const getCategoryTitle = (category: string): string => {
 // Mock API call to generate messages
 export const generateMessages = async (
   formData: FormData
-): Promise<ApiResponse> => {
+): Promise<ShowMessages> => {
   // Simulate API call delay
   await new Promise((resolve) => setTimeout(resolve, 3000));
 

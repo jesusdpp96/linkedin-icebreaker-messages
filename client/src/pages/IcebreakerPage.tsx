@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -11,39 +11,43 @@ import {
   Box,
   useTheme,
   useMediaQuery,
+  Snackbar,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import MessageCarousel from "../components/MessageCarousel";
 import MessageForm from "../components/MessageForm";
 import LoadingState from "../components/LoadingState";
 import UserInputSummary from "../components/UserInputSummary";
 import GeneratedMessages from "../components/GeneratedMessages";
-import { AppState, type FormData, type ApiResponse } from "../types";
-import { getSampleCards, generateMessages } from "../services/messageService";
+import { AppState, type FormData, type ShowMessages } from "../types";
+import { getSampleCards } from "../services/messageService";
 import { Layout } from "../components/Layout";
 import { PromoBanner } from "../components/PromoBanner";
+import { useIcebreakerMessages } from "../hooks/useIcebreakerMessages";
+import { getErrorMessage } from "../services/errorMessages";
 
 const IcebreakerPage: React.FC = () => {
+  const { messages, loading, error, fetchMessages, reset } =
+    useIcebreakerMessages();
   const [appState, setAppState] = useState<AppState>(AppState.INITIAL);
   const [formData, setFormData] = useState<FormData | null>(null);
+  const [open, setOpen] = useState(false);
+
   const [generatedMessages, setGeneratedMessages] =
-    useState<ApiResponse | null>(null);
+    useState<ShowMessages | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const sampleCards = getSampleCards();
 
   const handleFormSubmit = async (data: FormData) => {
-    setFormData(data);
-    setAppState(AppState.LOADING);
-
     try {
-      const response = await generateMessages(data);
-      setGeneratedMessages(response);
-      setAppState(AppState.RESPONSE);
-    } catch (error) {
-      console.error("Error generating messages:", error);
-      // Handle error state if needed
-      setAppState(AppState.INITIAL);
+      reset();
+      setFormData(data);
+      await fetchMessages(data);
+    } catch (err) {
+      console.error("Error generating messages:", err);
     }
   };
 
@@ -51,6 +55,7 @@ const IcebreakerPage: React.FC = () => {
     setAppState(AppState.INITIAL);
     setFormData(null);
     setGeneratedMessages(null);
+    reset();
   };
 
   const handleResetWithData = () => {
@@ -120,7 +125,10 @@ const IcebreakerPage: React.FC = () => {
                 }}
               >
                 <PromoBanner />
-                <MessageForm onSubmit={handleFormSubmit} />
+                <MessageForm
+                  onSubmit={handleFormSubmit}
+                  lastError={error ? getErrorMessage(error) : null}
+                />
               </Box>
             </Grid>
           </>
@@ -190,6 +198,34 @@ const IcebreakerPage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (loading) {
+      setAppState(AppState.LOADING);
+      return;
+    }
+    if (error) {
+      setOpen(true);
+      setAppState(AppState.INITIAL);
+      return;
+    }
+    if (messages) {
+      setGeneratedMessages({
+        messages: messages,
+      });
+      setAppState(AppState.RESPONSE);
+    }
+  }, [loading, error, messages]);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        if (error) {
+          setOpen(false);
+        }
+      }, 3_000); // 8 seconds
+    }
+  }, [open]);
+
   return (
     <Layout>
       <Box
@@ -208,6 +244,15 @@ const IcebreakerPage: React.FC = () => {
             {renderContent()}
           </Grid>
         </Container>
+        <Snackbar
+          open={open}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
+            <AlertTitle>Error</AlertTitle>
+            {getErrorMessage(error)}
+          </Alert>
+        </Snackbar>
       </Box>
     </Layout>
   );

@@ -7,16 +7,17 @@ import type { FormData } from "../types";
 
 interface MessageFormProps {
   onSubmit: (data: FormData) => void;
+  lastError?: string | null;
 }
 
 const initialFormState: FormData = {
-  senderProfileUrl: "",
+  senderUrl: "",
   problemDescription: "",
   solutionDescription: "",
-  receiverProfileUrl: "",
+  receiverUrl: "",
 };
 
-const MessageForm: React.FC<MessageFormProps> = ({ onSubmit }) => {
+const MessageForm: React.FC<MessageFormProps> = ({ onSubmit, lastError }) => {
   const {
     values,
     errors,
@@ -48,16 +49,24 @@ const MessageForm: React.FC<MessageFormProps> = ({ onSubmit }) => {
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
         <TextField
           fullWidth
-          name="senderProfileUrl"
+          name="senderUrl"
           label="URL de perfil de LinkedIn (emisor)"
           placeholder="La url de linkedin aquí"
           variant="outlined"
-          value={values.senderProfileUrl}
+          value={values.senderUrl}
           onChange={handleChange}
           onBlur={handleBlur}
-          error={touched.senderProfileUrl && Boolean(errors.senderProfileUrl)}
-          helperText={touched.senderProfileUrl && errors.senderProfileUrl}
+          error={touched.senderUrl && Boolean(errors.senderUrl)}
+          helperText={touched.senderUrl && errors.senderUrl}
           size="small"
+          InputProps={{
+            sx: {
+              "& .MuiInputBase-input": {
+                overflow: "hidden",
+                resize: "vertical",
+              },
+            },
+          }}
         />
 
         <TextField
@@ -76,6 +85,14 @@ const MessageForm: React.FC<MessageFormProps> = ({ onSubmit }) => {
           }
           helperText={touched.problemDescription && errors.problemDescription}
           size="small"
+          InputProps={{
+            sx: {
+              "& .MuiInputBase-input": {
+                overflow: "hidden",
+                resize: "vertical",
+              },
+            },
+          }}
         />
 
         <TextField
@@ -94,22 +111,36 @@ const MessageForm: React.FC<MessageFormProps> = ({ onSubmit }) => {
           }
           helperText={touched.solutionDescription && errors.solutionDescription}
           size="small"
+          InputProps={{
+            sx: {
+              "& .MuiInputBase-input": {
+                overflow: "hidden",
+                resize: "vertical",
+              },
+            },
+          }}
         />
 
         <TextField
           fullWidth
-          name="receiverProfileUrl"
+          name="receiverUrl"
           label="URL de perfil de LinkedIn (objetivo)"
           placeholder="El url de linkedin de tu objetivo aquí"
           variant="outlined"
-          value={values.receiverProfileUrl}
+          value={values.receiverUrl}
           onChange={handleChange}
           onBlur={handleBlur}
-          error={
-            touched.receiverProfileUrl && Boolean(errors.receiverProfileUrl)
-          }
-          helperText={touched.receiverProfileUrl && errors.receiverProfileUrl}
+          error={touched.receiverUrl && Boolean(errors.receiverUrl)}
+          helperText={touched.receiverUrl && errors.receiverUrl}
           size="small"
+          InputProps={{
+            sx: {
+              "& .MuiInputBase-input": {
+                overflow: "hidden",
+                resize: "vertical",
+              },
+            },
+          }}
         />
       </Box>
 
@@ -134,6 +165,16 @@ const MessageForm: React.FC<MessageFormProps> = ({ onSubmit }) => {
         <Typography variant="body2" color="primary" sx={{ mt: 1 }}>
           Se van a generar las 3 mejores opciones de mensajes personalizados
         </Typography>
+        {lastError && (
+          <Typography
+            variant="body2"
+            style={{ marginTop: "16px" }}
+            color="error"
+            sx={{ mt: 1 }}
+          >
+            {lastError}
+          </Typography>
+        )}
       </Box>
     </Paper>
   );

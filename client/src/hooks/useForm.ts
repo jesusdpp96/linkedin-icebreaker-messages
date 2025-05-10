@@ -26,7 +26,7 @@ export const useForm = (initialState: FormData) => {
     if (!value.trim()) {
       error = "Este campo es obligatorio";
     } else if (
-      (name === "senderProfileUrl" || name === "receiverProfileUrl") &&
+      (name === "senderUrl" || name === "receiverUrl") &&
       !validateUrl(value)
     ) {
       error = "URL de LinkedIn no válida";
@@ -78,8 +78,8 @@ export const useForm = (initialState: FormData) => {
   const isFormValid = useCallback(() => {
     return (
       Object.values(values).every((value) => value.trim() !== "") &&
-      validateUrl(values.senderProfileUrl) &&
-      validateUrl(values.receiverProfileUrl)
+      validateUrl(values.senderUrl) &&
+      validateUrl(values.receiverUrl)
     );
   }, [values]);
 

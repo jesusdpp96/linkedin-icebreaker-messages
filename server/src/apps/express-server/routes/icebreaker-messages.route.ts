@@ -65,14 +65,15 @@ router.post('/icebreaker-messages', async (req: Request, res: Response) => {
      * Presenting response
      */
     if (presenterDriver.isError) {
-      // error response
+      // present error response
       res.status(presenterDriver.code).send({
         status: 'error',
+        name: presenterDriver.name,
         message: `${presenterDriver.source} - ${presenterDriver.error?.message}`,
       })
       return
     }
-    // success response
+    // present success response
     res.status(200).send({
       status: 'success',
       data: presenterDriver.data,
@@ -87,6 +88,7 @@ router.post('/icebreaker-messages', async (req: Request, res: Response) => {
       case 'missing-openai-model':
         res.status(500).json({
           status: 'error',
+          name: 'missing_app_configuration',
           message: 'Lo sentimos, la app no esta configurada correctamente',
         })
         return
@@ -94,6 +96,7 @@ router.post('/icebreaker-messages', async (req: Request, res: Response) => {
       default:
         res.status(500).json({
           status: 'error',
+          name: 'unexpected_error',
           message: 'Lo sentimos, algo inesperado salio mal',
         })
         return

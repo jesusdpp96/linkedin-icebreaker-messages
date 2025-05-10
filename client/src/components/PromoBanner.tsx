@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 const getRandomIncrement = () => Math.floor(Math.random() * 3); // between 0 and 2
 
 export const PromoBanner = () => {
-  const [count, setCount] = useState(128); // initial number, tweak as needed
+  const [count, setCount] = useState(1128); // initial number, tweak as needed
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -95,7 +95,7 @@ export const PromoBanner = () => {
           variant="body1"
           sx={{ fontWeight: "normal", fontSize: "1rem", mt: 0.5 }}
         >
-          generando...
+          mensajes generados...
         </Typography>
       </Box>
     </Box>
