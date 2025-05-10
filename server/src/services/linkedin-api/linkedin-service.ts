@@ -160,8 +160,13 @@ export class LinkedInService {
       const result = await operation()
       this.trackCreditUsage(methodName, true)
       return result
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error(`Error en ${methodName}:`, error)
+      if (error.status === 429) {
+        const newError = new Error('linkedin_api_rate_limit')
+        throw newError
+      }
       throw error
     }
   }
