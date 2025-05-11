@@ -315,4 +315,4 @@ Table connection_request_state_history {
 
 ## Diagrama en pdf
 
-![db-linkedin-automations](./assets/db-linkedin-automations.pdf)
+![db-linkedin-automations](./assets/DB-linkedin-automations.pdf)

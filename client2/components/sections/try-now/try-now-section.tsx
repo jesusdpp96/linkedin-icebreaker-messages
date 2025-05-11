@@ -20,8 +20,12 @@ import {
 } from "@/services/message-service";
 import { useAnimation } from "@/hooks/use-animation";
 import type { Message } from "@/types/message-types";
+import { useIcebreakerMessages } from "@/hooks/useIcebreakerMessages";
+import { getErrorMessage } from "@/services/errorMessages";
 
 export function TryNowSection() {
+  const { messages, loading, error, fetchMessages, reset } =
+    useIcebreakerMessages();
   const sectionRef = useAnimation();
   const [availableGenerations, setAvailableGenerations] = useState(3);
   const [formData, setFormData] = useState({
@@ -38,6 +42,7 @@ export function TryNowSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedMessages, setGeneratedMessages] = useState<Message[]>([]);
   const [generationUsed, setGenerationUsed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Load available generations from localStorage on mount
   useEffect(() => {
@@ -93,7 +98,7 @@ export function TryNowSection() {
   // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+    setErrorMessage("");
     // Validate LinkedIn URLs
     let hasErrors = false;
     const newErrors = { senderLinkedIn: "", receiverLinkedIn: "" };
@@ -130,36 +135,36 @@ export function TryNowSection() {
       receiverUrl: formData.receiverLinkedIn,
     };
 
-    // Show loading modal
-    setIsLoading(true);
-    setIsModalOpen(true);
-    setGeneratedMessages([]);
-
     try {
       // Call API service
-      const response = await generateMessages(apiFormData);
-
-      // Update state with response data
-      if (response.status === "success") {
-        setGeneratedMessages(response.data);
-
-        // Use a generation and update the count only after successful generation
-        messageGenerationService.useGeneration();
-        const remaining = messageGenerationService.getAvailableGenerations();
-        setAvailableGenerations(remaining);
-      } else {
-        throw new Error("Error generating messages");
-      }
+      await fetchMessages(apiFormData);
     } catch (error) {
       console.error("Error:", error);
-      alert(
-        "Hubo un error al generar los mensajes. Por favor, inténtalo de nuevo."
-      );
-      setIsModalOpen(false);
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (loading) {
+      setIsLoading(true);
+      setIsModalOpen(true);
+      setGeneratedMessages([]);
+      return;
+    }
+    if (error) {
+      setIsLoading(false);
+      setIsModalOpen(false);
+      setErrorMessage(getErrorMessage(error));
+      return;
+    }
+    if (messages) {
+      setIsLoading(false);
+      setGeneratedMessages(messages);
+      // Use a generation and update the count only after successful generation
+      messageGenerationService.useGeneration();
+      const remaining = messageGenerationService.getAvailableGenerations();
+      setAvailableGenerations(remaining);
+    }
+  }, [loading, error, messages]);
 
   return (
     <SectionContainer id="try-now" ref={sectionRef}>
@@ -189,6 +194,11 @@ export function TryNowSection() {
             onInputChange={handleInputChange}
             onSubmit={handleSubmit}
           />
+          {errorMessage && (
+            <div className="p-4 text-red-700 bg-red-100 border border-red-300 rounded">
+              {errorMessage}
+            </div>
+          )}
         </div>
       </div>
 
