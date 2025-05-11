@@ -1,19 +1,23 @@
-"use client"
+"use client";
 
 /**
  * Header navigation component
  * Displays the navigation links in the header
  */
-import { ArrowUp } from "lucide-react"
-import { HeaderLink } from "./header-link"
+import { ArrowUp } from "lucide-react";
+import { HeaderLink } from "./header-link";
 
 interface HeaderNavigationProps {
-  isHomePage: boolean
-  showScrollTop: boolean
-  onScrollTop: () => void
+  isHomePage: boolean;
+  showScrollTop: boolean;
+  onScrollTop: () => void;
 }
 
-export function HeaderNavigation({ isHomePage, showScrollTop, onScrollTop }: HeaderNavigationProps) {
+export function HeaderNavigation({
+  isHomePage,
+  showScrollTop,
+  onScrollTop,
+}: HeaderNavigationProps) {
   return (
     <nav className="hidden md:flex gap-6">
       {isHomePage ? (
@@ -33,7 +37,6 @@ export function HeaderNavigation({ isHomePage, showScrollTop, onScrollTop }: Hea
       ) : (
         <HeaderLink href="/#try-now">Volver al inicio</HeaderLink>
       )}
-      <HeaderLink href="#">Blog</HeaderLink>
       {showScrollTop && isHomePage && (
         <button
           onClick={onScrollTop}
@@ -41,9 +44,9 @@ export function HeaderNavigation({ isHomePage, showScrollTop, onScrollTop }: Hea
           aria-label="Volver arriba"
         >
           <ArrowUp className="h-4 w-4" />
-          <span>Arriba</span>
+          <span>Ir al inicio</span>
         </button>
       )}
     </nav>
-  )
+  );
 }

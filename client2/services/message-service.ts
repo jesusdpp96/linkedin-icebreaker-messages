@@ -39,7 +39,7 @@ export const generateMessages = async (formData: FormData): Promise<MessageRespo
         templateTitle: "Pregunta sobre un post",
         templateCategory: "Pregunta",
         instruction: "Comenta en su post sobre formación de equipos y luego envía este mensaje para que te reconozca.",
-        sourcePosts: ["https://www.linkedin.com/feed/update/urn:li:activity:7313873886813544448/"],
+        sourcePosts: ["https://www.linkedin.com/feed/update/urn:li:activity:7313873886813544448/", "https://www.linkedin.com/feed/update/urn:li:activity:7313873886813544448/"],
         receiverName: "Florencia Diaz",
         receiverProfilePicture:
           "https://media.licdn.com/dms/image/v2/D4D03AQERV6DyIZn7vA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1665872050580?e=1752105600&v=beta&t=_c8Dda3NO21BUqi2J_apLWscWYgx5Yfd2Ay7hfcJ8pE",
