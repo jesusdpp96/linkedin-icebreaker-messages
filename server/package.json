@@ -5,13 +5,13 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "dev": "nodemon",
     "lint": "eslint . --ext .ts",
+    "test": "jest",
     "prettier-format": "prettier --config .prettierrc.json src/**/*.ts --write",
-    "start": "node dist/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "express-api:dev": "nodemon",
+    "express-api:start": "node dist/apps/express-server/main.js"
   },
-  "author": "trugamr",
+  "author": "jesusdpp96@gmail.com",
   "license": "ISC",
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -38,7 +38,13 @@
     "dotenv": "^16.5.0",
     "eslint-plugin-import": "^2.26.0",
     "express": "^5.1.0",
+    "module-alias": "^2.2.3",
     "ts-results": "^3.3.0",
     "zod": "^3.24.4"
+  },
+  "_moduleAliases": {
+    "@services": "dist/services",
+    "@domain": "dist/domain",
+    "@features/icebreaker-messages-request": "dist/features/icebreaker-messages-request"
   }
 }

@@ -4,7 +4,6 @@
     "module": "commonjs",
     "lib": [
       "es6",
-      "dom"
     ],
     "allowJs": true,
     "outDir": "dist",
@@ -27,7 +26,6 @@
       ]
     },
     "types": [
-      "jest",
       "node"
     ]
   },
@@ -35,6 +33,8 @@
     "src/**/*"
   ],
   "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
     "node_modules",
     "dist"
   ],
