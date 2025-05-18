@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import { config } from '../config'
+import { AppError, errorMapper } from '../errors'
 
 /**
  * Middleware to handle feature flag routing
@@ -13,10 +14,11 @@ export const icebreakerMessagesMiddleware = (
   const featureFlag = config.FEATURE_ICEBREAKER_MESSAGES_STRATEGY
 
   if (!featureFlag) {
-    res.status(500).json({
+    const errorDetails = errorMapper(AppError.MISSING_FEATURE_FLAG)
+    res.status(errorDetails.status).json({
       status: 'error',
-      name: 'missing-feature-flag',
-      message: 'missing-feature-flag',
+      name: errorDetails.name,
+      message: errorDetails.message,
     })
     return
   }
@@ -43,14 +45,16 @@ export const icebreakerMessagesMiddleware = (
         req.url = '/api/icebreaker-messages/fake-random'
         next()
         return
-      default:
+      default: {
         // If feature flag value is not recognized, return an error
-        res.status(500).json({
+        const errorDetails = errorMapper(AppError.INVALID_FEATURE_FLAG)
+        res.status(errorDetails.status).json({
           status: 'error',
-          name: 'invalid-feature-flag',
-          message: `Invalid feature flag value: ${featureFlag}`,
+          name: errorDetails.name,
+          message: errorDetails.message,
         })
         return
+      }
     }
   }
 

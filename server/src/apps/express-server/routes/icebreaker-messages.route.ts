@@ -81,6 +81,7 @@ import {
   InRamDbDriver,
 } from '@features/icebreaker-messages-request'
 import { config } from '../config'
+import { AppError, errorMapper } from '../errors'
 
 const router = Router()
 
@@ -95,13 +96,13 @@ router.post('/icebreaker-messages', async (req: Request, res: Response) => {
     const openaiApiKey = config.OPENAI_API_KEY
     const model = config.OPENAI_MODEL
     if (!linkedinApiKey) {
-      throw new Error('missing-linkedin-api-key')
+      throw new Error(AppError.MISSING_LINKEDIN_API_KEY)
     }
     if (!openaiApiKey) {
-      throw new Error('missing-openai-api-key')
+      throw new Error(AppError.MISSING_OPENAI_API_KEY)
     }
     if (!model) {
-      throw new Error('missing-openai-model')
+      throw new Error(AppError.MISSING_OPENAI_MODEL)
     }
     const linkedinService = new LinkedInService({ apiKey: linkedinApiKey })
     const openaiService = new OpenAIChatService({ apiKey: openaiApiKey, model: model })
@@ -155,25 +156,12 @@ router.post('/icebreaker-messages', async (req: Request, res: Response) => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    switch (err?.message) {
-      case 'missing-linkedin-api-key':
-      case 'missing-openai-api-key':
-      case 'missing-openai-model':
-        res.status(500).json({
-          status: 'error',
-          name: 'missing_app_configuration',
-          message: 'Lo sentimos, la app no esta configurada correctamente',
-        })
-        return
-
-      default:
-        res.status(500).json({
-          status: 'error',
-          name: 'unexpected_error',
-          message: 'Lo sentimos, algo inesperado salio mal',
-        })
-        return
-    }
+    const errorDetails = errorMapper(err.message)
+    res.status(errorDetails.status).send({
+      status: 'error',
+      name: errorDetails.name,
+      message: `${errorDetails.message} - ${err.message}`,
+    })
   }
 })
 

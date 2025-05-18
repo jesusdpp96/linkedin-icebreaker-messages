@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import { config } from '../config'
+import { AppError, errorMapper } from '../errors'
 
 const ROUTES_DEVELOPMENT_ONLY = ['/api/linkedin-api', '/api/openai-api']
 
@@ -14,10 +15,11 @@ export const developmentOnly = (req: Request, res: Response, next: NextFunction)
   const nodeEnv = config.NODE_ENV
 
   if (!nodeEnv) {
-    res.status(500).json({
+    const errorDetails = errorMapper(AppError.MISSING_ENVIRONMENT_DEFINITION)
+    res.status(errorDetails.status).json({
       status: 'error',
-      name: 'missing-environment-definition',
-      message: 'missing-environment-definition',
+      name: errorDetails.name,
+      message: errorDetails.message,
     })
     return
   }
@@ -25,25 +27,29 @@ export const developmentOnly = (req: Request, res: Response, next: NextFunction)
   // Only apply redirection logic to the specific endpoints
   if (ROUTES_DEVELOPMENT_ONLY.includes(req.path)) {
     switch (nodeEnv) {
-      case 'production':
-        res.status(500).json({
+      case 'production': {
+        const errorDetails = errorMapper(AppError.ROUTE_NOT_AVAILABLE)
+        res.status(errorDetails.status).json({
           status: 'error',
-          name: 'route-not-available',
-          message: 'This route is not available in production mode',
+          name: errorDetails.name,
+          message: errorDetails.message,
         })
         return
+      }
       case 'development':
         // Normal flow, continue to the original handler
         next()
         return
-      default:
+      default: {
         // If environment value is not recognized, return an error
-        res.status(500).json({
+        const errorDetails = errorMapper(AppError.INVALID_ENVIRONMENT)
+        res.status(errorDetails.status).json({
           status: 'error',
-          name: 'invalid-environment',
-          message: `Invalid environment value: ${nodeEnv}`,
+          name: errorDetails.name,
+          message: errorDetails.message,
         })
         return
+      }
     }
   }
 
