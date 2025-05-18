@@ -4,8 +4,6 @@ import {
   IcebreakerSuccessResponse,
 } from "@/types";
 
-const API_URL = "http://localhost:3001/api/icebreaker-messages";
-
 /**
  * Service for interacting with the icebreaker messages API
  */
@@ -23,8 +21,12 @@ export class IcebreakerMessageService {
     const { signal } = controller;
 
     const promise = new Promise<IcebreakerResponse>(async (resolve, reject) => {
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const endpoint = `${apiUrl}/icebreaker-messages`;
+
       try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
