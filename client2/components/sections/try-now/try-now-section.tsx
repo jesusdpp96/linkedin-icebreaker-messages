@@ -20,8 +20,8 @@ import {
 } from "@/services/message-service";
 import { useAnimation } from "@/hooks/use-animation";
 import type { Message } from "@/types/message-types";
-import { useIcebreakerMessages } from "@/hooks/useIcebreakerMessages";
-import { getErrorMessage } from "@/services/errorMessages";
+import { useIcebreakerMessages } from "@/hooks/use-icebreaker-messages";
+import { getErrorMessage } from "@/services/error-messages";
 
 export function TryNowSection() {
   const { messages, loading, error, fetchMessages, reset } =

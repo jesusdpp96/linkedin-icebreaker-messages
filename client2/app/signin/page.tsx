@@ -2,19 +2,26 @@
  * Sign in page component
  * Displays the sign in form
  */
-"use client"
+"use client";
 
-import { useState, type FormEvent } from "react"
-import { Header } from "@/components/layout/header/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2 } from "lucide-react"
-import Link from "next/link"
-import { useFormValidation } from "@/hooks/use-form-validation"
+import { useState, type FormEvent } from "react";
+import { Header } from "@/components/layout/header/header";
+import { Footer } from "@/components/layout/footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useFormValidation } from "@/hooks/use-form-validation";
 
 export default function SignInPage() {
   // Form validation using custom hook
@@ -29,13 +36,13 @@ export default function SignInPage() {
     email: "",
     password: "",
     confirmPassword: "",
-  })
+  });
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showServiceError, setShowServiceError] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showServiceError, setShowServiceError] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Define validation rules
     const rules = {
@@ -43,23 +50,23 @@ export default function SignInPage() {
       email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
       password: { required: true, minLength: 8 },
       confirmPassword: { required: true, match: "password" },
-    }
+    };
 
     if (validate(rules)) {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       // Simulate form submission
       setTimeout(() => {
-        setIsSubmitting(false)
-        setShowServiceError(true)
+        setIsSubmitting(false);
+        setShowServiceError(true);
 
         // Hide error message after 5 seconds
         setTimeout(() => {
-          setShowServiceError(false)
-        }, 5000)
-      }, 1500)
+          setShowServiceError(false);
+        }, 5000);
+      }, 1500);
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen flex-col dark bg-black text-white">
@@ -68,7 +75,9 @@ export default function SignInPage() {
         <div className="w-full max-w-md">
           <Card className="bg-zinc-800/50 border-zinc-700 backdrop-blur-sm">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center">Crear cuenta</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">
+                Crear cuenta
+              </CardTitle>
               <CardDescription className="text-zinc-400 text-center">
                 Ingresa tus datos para registrarte en la plataforma
               </CardDescription>
@@ -78,8 +87,8 @@ export default function SignInPage() {
                 <Alert className="mb-6 bg-red-900/30 border-red-800 text-red-200">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Lo sentimos, el servicio de registro está temporalmente fuera de servicio. Por favor, inténtalo más
-                    tarde.
+                    Lo sentimos, el servicio de registro está temporalmente
+                    fuera de servicio. Por favor, inténtalo más tarde.
                   </AlertDescription>
                 </Alert>
               )}
@@ -97,7 +106,9 @@ export default function SignInPage() {
                     onChange={handleChange}
                     className="bg-zinc-900/50 border-zinc-700 text-white"
                   />
-                  {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
+                  {errors.name && (
+                    <p className="text-red-400 text-sm mt-1">{errors.name}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -113,7 +124,9 @@ export default function SignInPage() {
                     onChange={handleChange}
                     className="bg-zinc-900/50 border-zinc-700 text-white"
                   />
-                  {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                  {errors.email && (
+                    <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -129,7 +142,11 @@ export default function SignInPage() {
                     onChange={handleChange}
                     className="bg-zinc-900/50 border-zinc-700 text-white"
                   />
-                  {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+                  {errors.password && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -145,7 +162,11 @@ export default function SignInPage() {
                     onChange={handleChange}
                     className="bg-zinc-900/50 border-zinc-700 text-white"
                   />
-                  {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
 
                 <Button
@@ -187,5 +208,5 @@ export default function SignInPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }
