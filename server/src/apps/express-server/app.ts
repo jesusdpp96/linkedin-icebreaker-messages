@@ -1,5 +1,5 @@
 import express from 'express'
-import { corsMiddleware, icebreakerMessagesMiddleware } from './middlewares'
+import { corsMiddleware, developmentOnly, icebreakerMessagesMiddleware } from './middlewares'
 import healthRouter from './routes/health.route'
 import linkedinApiRouter from './routes/linkedin-api.route'
 import openaiApiRouter from './routes/openai-api.route'
@@ -10,8 +10,9 @@ const app = express()
 
 // Middlewares
 app.use(corsMiddleware)
-app.use(express.json())
+app.use(developmentOnly)
 app.use(icebreakerMessagesMiddleware)
+app.use(express.json())
 
 // Routes
 app.use('/api', healthRouter)

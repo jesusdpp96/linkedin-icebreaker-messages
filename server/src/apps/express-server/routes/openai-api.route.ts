@@ -33,6 +33,9 @@
  *   "message": "Failed to process prompt with OpenAI API",
  *   "details": "Error details here"
  * }
+ *
+ * @note This route is not intended for production use and serves only as a testing utility.
+ * @note developmentOnly is used to prevent direct requests to this route in production.
  */
 import type { Request, Response } from 'express'
 import { Router } from 'express'

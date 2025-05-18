@@ -16,6 +16,7 @@
  * @response {400} Error - Returns an error message if the type is invalid or required parameters are missing.
  *
  * @note This route is not intended for production use and serves only as a testing utility.
+ * @note developmentOnly is used to prevent direct requests to this route in production.
  */
 import type { Request, Response } from 'express'
 import { Router } from 'express'
