@@ -139,10 +139,10 @@ router.post('/icebreaker-messages', async (req: Request, res: Response) => {
      */
     if (presenterDriver.isError) {
       // present error response
-      res.status(presenterDriver.code).send({
+      res.status(presenterDriver.error?.details.status || 500).send({
         status: 'error',
-        name: presenterDriver.name,
-        message: `${presenterDriver.source} - ${presenterDriver.error?.message}`,
+        name: presenterDriver.error?.details.name,
+        message: `${presenterDriver.error?.details.message} - ${presenterDriver.error?.instance.message}`,
       })
       return
     }
