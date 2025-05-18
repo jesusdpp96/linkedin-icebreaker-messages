@@ -1,15 +1,12 @@
 import cors from 'cors'
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:3000',
-]
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
 
 export const corsMiddleware = cors({
   origin: (origin, callback) => {
-    console.log('Origin:', origin)
-    if (!origin || allowedOrigins.includes(origin)) {
+    const originStr = origin || ''
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(originStr)) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))
