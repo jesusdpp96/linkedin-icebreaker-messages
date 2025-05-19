@@ -2,22 +2,22 @@
  * Main landing page component
  * Assembles all sections of the landing page
  */
-"use client"
+"use client";
 
-import { Header } from "@/components/layout/header/header"
-import { HeroSection } from "@/components/sections/hero/hero-section"
-import { TryNowSection } from "@/components/sections/try-now/try-now-section"
-import { TestimonialsSection } from "@/components/testimonials-section"
-import { PricingSection } from "@/components/sections/pricing/pricing-section"
-import { AutomationSection } from "@/components/sections/automation/automation-section"
-import { CTASection } from "@/components/cta-section"
-import { Footer } from "@/components/footer"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { Header } from "@/components/layout/header/header";
+import { HeroSection } from "@/components/sections/hero/hero-section";
+import { TryNowSection } from "@/components/sections/try-now/try-now-section";
+import { TestimonialsSection } from "@/components/sections/testimonials-section";
+import { PricingSection } from "@/components/sections/pricing/pricing-section";
+import { AutomationSection } from "@/components/sections/automation/automation-section";
+import { CTASection } from "@/components/sections/cta-section";
+import { Footer } from "@/components/layout/footer";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger)
+  gsap.registerPlugin(ScrollTrigger);
 }
 
 export default function LandingPage() {
@@ -34,5 +34,5 @@ export default function LandingPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

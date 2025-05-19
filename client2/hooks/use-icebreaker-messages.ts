@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IcebreakerMessage, IcebreakerRequest } from "@/types"
-import { IcebreakerMessageService } from "../services/icebreakerMessageService";
+import { IcebreakerMessageService } from "../services/icebreaker-message-service";
 
 interface UseIcebreakerMessagesReturn {
   messages: IcebreakerMessage[] | null;

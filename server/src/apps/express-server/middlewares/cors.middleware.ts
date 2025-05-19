@@ -1,6 +1,6 @@
 import cors from 'cors'
-
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
+import { config } from '../config'
+const allowedOrigins = config.ALLOWED_ORIGINS.split(',') || []
 
 export const corsMiddleware = cors({
   origin: (origin, callback) => {

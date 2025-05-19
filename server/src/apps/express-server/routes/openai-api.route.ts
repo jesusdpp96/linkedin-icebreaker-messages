@@ -33,11 +33,15 @@
  *   "message": "Failed to process prompt with OpenAI API",
  *   "details": "Error details here"
  * }
+ *
+ * @note This route is not intended for production use and serves only as a testing utility.
+ * @note developmentOnly is used to prevent direct requests to this route in production.
  */
 import type { Request, Response } from 'express'
 import { Router } from 'express'
 import { OpenAIChatService } from '@services'
 import { config } from '../config'
+import { AppError, errorMapper } from '../errors'
 
 const router = Router()
 
@@ -46,12 +50,22 @@ router.get('/openai-api', async (req: Request, res: Response) => {
   const model = config.OPENAI_MODEL
 
   if (!apiKey) {
-    res.status(500).json({ status: 'error', message: 'Missing OpenAI API key in config.' })
+    const errorDetails = errorMapper(AppError.MISSING_OPENAI_API_KEY)
+    res.status(errorDetails.status).send({
+      status: 'error',
+      name: errorDetails.name,
+      message: `${errorDetails.message}`,
+    })
     return
   }
 
   if (!model) {
-    res.status(500).json({ status: 'error', message: 'Missing OpenAI model in config.' })
+    const errorDetails = errorMapper(AppError.MISSING_OPENAI_MODEL)
+    res.status(errorDetails.status).send({
+      status: 'error',
+      name: errorDetails.name,
+      message: `${errorDetails.message}`,
+    })
     return
   }
 
@@ -59,7 +73,12 @@ router.get('/openai-api', async (req: Request, res: Response) => {
   const json = req.query.json as string | undefined
 
   if (!prompt) {
-    res.status(400).json({ status: 'error', message: 'Missing required query param: prompt' })
+    const errorDetails = errorMapper(AppError.MISSING_REQUIRED_QUERY_PARAM)
+    res.status(errorDetails.status).send({
+      status: 'error',
+      name: errorDetails.name,
+      message: `${errorDetails.message}`,
+    })
     return
   }
 
@@ -77,11 +96,11 @@ router.get('/openai-api', async (req: Request, res: Response) => {
     return
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error('[OpenAI API error]:', error.message)
-    res.status(500).json({
+    const errorDetails = errorMapper(AppError.OPEN_AI_UNEXPECTED_ERROR)
+    res.status(errorDetails.status).send({
       status: 'error',
-      message: 'Failed to process prompt with OpenAI API',
-      details: error.message,
+      name: errorDetails.name,
+      message: `${errorDetails.message} - ${error.message}`,
     })
     return
   }
