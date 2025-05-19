@@ -1,26 +1,28 @@
-"use client"
+"use client";
 
 /**
  * Smart component for the pricing section
  * Manages state and logic for the pricing section
  */
-import { useRouter } from "next/navigation"
-import { SectionContainer } from "@/components/ui/section-container"
-import { SectionHeader } from "@/components/ui/section-header"
-import { PricingPlan } from "./pricing-plan"
-import { useAnimation } from "@/hooks/use-animation"
+import { useRouter } from "next/navigation";
+import { SectionContainer } from "@/components/ui/section-container";
+import { SectionHeader } from "@/components/ui/section-header";
+import { PricingPlan } from "./pricing-plan";
+import { useAnimation } from "@/hooks/use-animation";
 
 export function PricingSection() {
-  const sectionRef = useAnimation()
-  const router = useRouter()
+  const sectionRef = useAnimation();
+  const router = useRouter();
 
   const handlePlanClick = () => {
-    router.push("/signin")
-  }
+    router.push("/signin");
+  };
 
   const scrollToAutomation = () => {
-    document.getElementById("automation")?.scrollIntoView({ behavior: "smooth" })
-  }
+    document
+      .getElementById("automation")
+      ?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Basic plan features
   const basicFeatures = [
@@ -28,7 +30,7 @@ export function PricingSection() {
     { text: "Análisis básico de perfiles" },
     { text: "3 categorías de mensajes" },
     { text: "Soporte por email" },
-  ]
+  ];
 
   // Professional plan features
   const professionalFeatures = [
@@ -37,7 +39,7 @@ export function PricingSection() {
     { text: "Todas las categorías de mensajes" },
     { text: "Personalización de tono" },
     { text: "Soporte prioritario" },
-  ]
+  ];
 
   // Enterprise plan features
   const enterpriseFeatures = [
@@ -47,14 +49,14 @@ export function PricingSection() {
     { text: "Integración con CRM" },
     { text: "Soporte 24/7" },
     { text: "Acceso a automatizaciones LinkedIn (Beta)", isBeta: true },
-  ]
+  ];
 
   return (
     <SectionContainer id="pricing" ref={sectionRef}>
       <SectionHeader
         badge="Precios"
         title="Planes simples y transparentes"
-        subtitle="Elige el plan que mejor se adapte a tus necesidades de networking. Todos incluyen una prueba gratuita de 14 días."
+        subtitle="Elige el plan que mejor se adapte a tus necesidades de networking."
       />
 
       <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-3">
@@ -86,5 +88,5 @@ export function PricingSection() {
         />
       </div>
     </SectionContainer>
-  )
+  );
 }

@@ -5,11 +5,14 @@
  * Displays a promotional banner with a counter
  */
 import { useEffect, useState } from "react";
+import { usePostHog } from "posthog-js/react";
 
 const getRandomIncrement = () => Math.floor(Math.random() * 3); // between 0 and 2
 
 export function PromoBanner() {
   const [count, setCount] = useState(1128); // initial number
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const posthog = usePostHog();
 
   useEffect(() => {
     // Update count at random intervals
@@ -59,6 +62,16 @@ export function PromoBanner() {
     }, 2000);
   }, [count]);
 
+  const handleCounterClick = () => {
+    if (!hasInteracted) {
+      // Track counter interaction
+      posthog.capture("counter_interaction", {
+        counter_value: count,
+      });
+      setHasInteracted(true);
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row items-center justify-between bg-zinc-800/50 backdrop-blur-sm rounded-lg p-6 border border-zinc-700">
       <div className="flex-1 text-center md:text-left mb-4 md:mb-0">
@@ -69,7 +82,10 @@ export function PromoBanner() {
           ¡Las primeras 3 generaciones son gratis!
         </p>
       </div>
-      <div className="min-w-[140px] text-center bg-gradient-to-br from-zinc-900/80 to-zinc-800/80 p-3 rounded-lg font-bold shadow-inner border border-zinc-700">
+      <div
+        className="min-w-[140px] text-center bg-gradient-to-br from-zinc-900/80 to-zinc-800/80 p-3 rounded-lg font-bold shadow-inner border border-zinc-700 cursor-pointer"
+        onClick={handleCounterClick}
+      >
         <div
           className="font-bold leading-none"
           style={{ fontSize: "3rem", lineHeight: "1" }}

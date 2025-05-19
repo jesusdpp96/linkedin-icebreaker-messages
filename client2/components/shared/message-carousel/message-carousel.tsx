@@ -5,6 +5,7 @@
  * Manages state and logic for the carousel
  */
 import { useEffect, useRef, useState } from "react";
+import { usePostHog } from "posthog-js/react";
 import { LinkedInMessageCard } from "./linkedin-message-card";
 import { MessageCarouselControls } from "./message-carousel-controls";
 
@@ -31,6 +32,8 @@ export function MessageCarousel({ slides }: MessageCarouselProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const posthog = usePostHog();
+  const [hasTrackedView, setHasTrackedView] = useState(false);
 
   // Calculate previous and next indices
   const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
@@ -60,6 +63,32 @@ export function MessageCarousel({ slides }: MessageCarouselProps) {
     };
   }, [isPaused, isTransitioning]);
 
+  // Track example view when carousel is visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasTrackedView) {
+          posthog.capture("view_examples", {
+            carousel_position: "hero_section",
+            message_category: slides[currentIndex].messageCategory,
+          });
+          setHasTrackedView(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (carouselRef.current) {
+      observer.observe(carouselRef.current);
+    }
+
+    return () => {
+      if (carouselRef.current) {
+        observer.unobserve(carouselRef.current);
+      }
+    };
+  }, [posthog, slides, currentIndex, hasTrackedView]);
+
   // Handle mouse enter on active slide
   const handleMouseEnter = () => {
     setIsPaused(true);
@@ -77,6 +106,14 @@ export function MessageCarousel({ slides }: MessageCarouselProps) {
     setIsTransitioning(true);
     setCurrentIndex(prevIndex);
 
+    // Track carousel navigation
+    posthog.capture("carousel_navigation", {
+      direction: "previous",
+      from_index: currentIndex,
+      to_index: prevIndex,
+      message_category: slides[prevIndex].messageCategory,
+    });
+
     // Reset transition state after animation completes
     setTimeout(() => {
       setIsTransitioning(false);
@@ -90,6 +127,14 @@ export function MessageCarousel({ slides }: MessageCarouselProps) {
     setIsTransitioning(true);
     setCurrentIndex(nextIndex);
 
+    // Track carousel navigation
+    posthog.capture("carousel_navigation", {
+      direction: "next",
+      from_index: currentIndex,
+      to_index: nextIndex,
+      message_category: slides[nextIndex].messageCategory,
+    });
+
     // Reset transition state after animation completes
     setTimeout(() => {
       setIsTransitioning(false);
@@ -101,6 +146,15 @@ export function MessageCarousel({ slides }: MessageCarouselProps) {
     if (isTransitioning || index === currentIndex) return;
 
     setIsTransitioning(true);
+
+    // Track carousel navigation
+    posthog.capture("carousel_navigation", {
+      direction: "indicator",
+      from_index: currentIndex,
+      to_index: index,
+      message_category: slides[index].messageCategory,
+    });
+
     setCurrentIndex(index);
 
     setTimeout(() => {

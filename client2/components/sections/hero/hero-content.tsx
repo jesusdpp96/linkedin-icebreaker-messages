@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Hero content component
  * Displays the main content of the hero section
@@ -5,8 +7,21 @@
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { buttonStyles } from "@/utils/styles";
+import { usePostHog } from "posthog-js/react";
 
 export function HeroContent() {
+  const posthog = usePostHog();
+
+  const handleCtaClick = () => {
+    // Track CTA click event
+    posthog.capture("click_cta", {
+      cta_location: "hero_section",
+      cta_text: "Prueba gratis",
+    });
+
+    window.location.href = "#try-now";
+  };
+
   return (
     <div className="w-full md:w-2/5 flex flex-col justify-center space-y-4 text-center md:text-left">
       <div className="space-y-2">
@@ -23,7 +38,7 @@ export function HeroContent() {
         <Button
           size="lg"
           className={`gap-1 ${buttonStyles.primary}`}
-          onClick={() => (window.location.href = "#try-now")}
+          onClick={handleCtaClick}
         >
           Prueba gratis <ChevronRight className="h-4 w-4" />
         </Button>

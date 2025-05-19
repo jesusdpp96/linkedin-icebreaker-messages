@@ -14,14 +14,12 @@ import { TryNowCTA } from "./try-now-cta";
 import { TryNowBenefits } from "./try-now-benefits";
 import { TryNowForm } from "./try-now-form";
 import { MessageResultModal } from "@/components/shared/message-result-modal";
-import {
-  generateMessages,
-  messageGenerationService,
-} from "@/services/message-service";
+import { messageGenerationService } from "@/services/message-service";
 import { useAnimation } from "@/hooks/use-animation";
 import type { Message } from "@/types/message-types";
 import { useIcebreakerMessages } from "@/hooks/use-icebreaker-messages";
 import { getErrorMessage } from "@/services/error-messages";
+import { usePostHog } from "posthog-js/react";
 
 export function TryNowSection() {
   const { messages, loading, error, fetchMessages, reset } =
@@ -43,6 +41,11 @@ export function TryNowSection() {
   const [generatedMessages, setGeneratedMessages] = useState<Message[]>([]);
   const [generationUsed, setGenerationUsed] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [generationStartTime, setGenerationStartTime] = useState<number | null>(
+    null
+  );
+  const posthog = usePostHog();
+  const [hasGenerated, setHasGenerated] = useState(false);
 
   // Load available generations from localStorage on mount
   useEffect(() => {
@@ -88,6 +91,32 @@ export function TryNowSection() {
     resetForm();
   };
 
+  // Track modal abandonment
+  useEffect(() => {
+    let abandonmentTimeout: NodeJS.Timeout | null = null;
+
+    if (isLoading && generationStartTime) {
+      // Set a timeout to detect if user leaves the page during loading
+      abandonmentTimeout = setTimeout(() => {
+        // This will only run if the component is unmounted before loading completes
+      }, 30000); // 30 seconds timeout
+    }
+
+    return () => {
+      if (abandonmentTimeout) {
+        clearTimeout(abandonmentTimeout);
+      }
+
+      // If modal is open, loading is active, and component unmounts, track abandonment
+      if (isLoading && generationStartTime) {
+        const timeWaited = Date.now() - generationStartTime;
+        posthog.capture("abandon_during_loading", {
+          time_waited_ms: timeWaited,
+        });
+      }
+    };
+  }, [isLoading, generationStartTime, posthog]);
+
   // Scroll to form
   const scrollToForm = () => {
     document
@@ -127,6 +156,9 @@ export function TryNowSection() {
       return;
     }
 
+    // Set generation start time for tracking
+    setGenerationStartTime(Date.now());
+
     // Prepare API request data
     const apiFormData = {
       senderUrl: formData.senderLinkedIn,
@@ -140,6 +172,12 @@ export function TryNowSection() {
       await fetchMessages(apiFormData);
     } catch (error) {
       console.error("Error:", error);
+
+      // Track generation error
+      posthog.capture("generation_error", {
+        error_type: error instanceof Error ? error.name : "unknown",
+        error_message: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   };
 
@@ -150,21 +188,55 @@ export function TryNowSection() {
       setGeneratedMessages([]);
       return;
     }
+
     if (error) {
       setIsLoading(false);
       setIsModalOpen(false);
       setErrorMessage(getErrorMessage(error));
+
+      // Track generation error
+      posthog.capture("generation_error", {
+        error_type: error,
+        error_message: getErrorMessage(error),
+      });
+
       return;
     }
+
     if (messages) {
+      const endTime = Date.now();
       setIsLoading(false);
       setGeneratedMessages(messages);
+
       // Use a generation and update the count only after successful generation
-      messageGenerationService.useGeneration();
+      if (!hasGenerated) {
+        messageGenerationService.useGeneration();
+        setHasGenerated(true);
+      }
       const remaining = messageGenerationService.getAvailableGenerations();
       setAvailableGenerations(remaining);
+
+      // Track successful generation
+      if (generationStartTime) {
+        const generationDuration = endTime - generationStartTime;
+
+        posthog.capture("generation_complete", {
+          generation_count: 3 - remaining, // Based on starting with 3 free generations
+          message_count: messages.length,
+          duration_ms: generationDuration,
+        });
+
+        posthog.capture("generation_time", {
+          duration_ms: generationDuration,
+        });
+
+        // Track messages per session
+        posthog.capture("session_messages", {
+          message_count: messages.length,
+        });
+      }
     }
-  }, [loading, error, messages]);
+  }, [loading, error, messages, generationStartTime, posthog, hasGenerated]);
 
   return (
     <SectionContainer id="try-now" ref={sectionRef}>
