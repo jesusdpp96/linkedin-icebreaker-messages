@@ -17,6 +17,8 @@ You can see the demo page of the project at:
 
 Watch the demo video to see the project in action:
 
+[!Watch the demo video](./docs/assets/demo-icebreaker-v2-julian-florencia.mp4)
+
 ## Read more
 
 You can read more about the project in the following articles:
