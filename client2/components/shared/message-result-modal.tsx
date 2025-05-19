@@ -4,7 +4,7 @@
  * Message result modal component
  * Displays the generated messages in a modal
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { Message } from "@/types/message-types";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
 import { Loader2, Copy, CheckCircle, ExternalLink } from "lucide-react";
 import { buttonStyles } from "@/utils/styles";
 import Linkedin from "../../assets/linkedin.png";
+import { usePostHog } from "posthog-js/react";
 
 interface MessageResultModalProps {
   isOpen: boolean;
@@ -35,14 +36,52 @@ export function MessageResultModal({
   messages,
 }: MessageResultModalProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const posthog = usePostHog();
+  const [startTime, setStartTime] = useState<number>(0);
+
+  // FIXME: this logic generate loop and make app crash when modal is openned, need to be fixed
+  // Simple effect to track modal opening and closing
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     // When modal opens, record the start time
+  //     setStartTime(Date.now());
+
+  //     // Track generation started
+  //     if (isLoading) {
+  //       posthog.capture("generation_started");
+  //     } else {
+  //       // Track generation completed when modal opens with results
+  //       posthog.capture("generation_complete", {
+  //         message_count: messages.length,
+  //         generation_time_ms: Date.now() - startTime,
+  //       });
+  //     }
+  //   } else if (startTime > 0 && isLoading) {
+  //     // If modal closes while still loading, track as abandonment
+  //     posthog.capture("abandon_during_loading", {
+  //       time_waited_ms: Date.now() - startTime,
+  //     });
+  //   }
+  // }, [isOpen, isLoading, messages.length, posthog, startTime]);
 
   const copyToClipboard = async (text: string, index: number) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
+
+      // Track message copy event with relevant properties
+      posthog.capture("message_copy", {
+        message_index: index,
+        message_category: messages[index].templateCategory,
+        message_title: messages[index].templateTitle,
+      });
+
       setTimeout(() => setCopiedIndex(null), 2000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to copy text: ", err);
+
+      // Track copy failure
+      posthog.capture("copy_error", { error: err.message });
     }
   };
 
@@ -217,6 +256,14 @@ export function MessageResultModal({
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center text-sm text-linkedin hover:text-linkedin-light transition-colors"
+                              onClick={() => {
+                                // Track source post click
+                                posthog.capture("source_post_click", {
+                                  message_index: index,
+                                  post_index: postIndex,
+                                  post_url: post,
+                                });
+                              }}
                             >
                               <ExternalLink className="h-4 w-4 mr-1" />
                               Ver post en LinkedIn
