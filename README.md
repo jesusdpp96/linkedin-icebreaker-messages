@@ -1,5 +1,29 @@
-# Run project
+# Introduction
 
+This is a fullstack application designed to create personalized **cold messages** to send to a LinkedIn profile, tailored to your specific goal. Read the [Design document](./docs/design-document.md) for more information about the project.
+
+> **Note**: This project was created as part of a technical challenge for a job interview. The goal is to demonstrate my skills in fullstack web development, including the use of modern technologies and best development practices.
+
+
+# Demo
+
+## Demo page
+
+You can see the demo page of the project at:
+
+[https://linkedin-icebreaker-messages.vercel.app/](https://linkedin-icebreaker-messages.vercel.app/)
+
+## Demo Video
+
+Watch the demo video to see the project in action:
+
+## Read more
+
+You can read more about the project in the following articles:
+
+- [Design document](./docs/design-document.md)
+
+# Run project
 
 ## [Optional] Use devcontainer
 
