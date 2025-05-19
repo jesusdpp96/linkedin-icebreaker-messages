@@ -25,6 +25,11 @@ export const MAP: {
     name: 'missing_app_configuration',
     message: '[ES App] Missing LinkedIn API key in app configuration',
   },
+  [AppError.REQUEST_LIMIT_REACHED]: {
+    status: 429,
+    name: 'request_limit_reached',
+    message: '[ES App] Request limit reached',
+  },
   /**
    * development-only middleware
    */

@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from 'express'
 import { config } from '../config'
 import { AppError, errorMapper } from '../errors'
+import { RequestCounter } from '../utils'
+
+const requestCounter = RequestCounter.getInstance('/api/icebreaker-messages', 10)
 
 /**
  * Middleware to handle feature flag routing
@@ -26,10 +29,21 @@ export const icebreakerMessagesMiddleware = (
   // Only apply redirection logic to the specific endpoint
   if (req.path === '/api/icebreaker-messages') {
     switch (featureFlag) {
-      case 'response':
+      case 'response': {
+        const isRequestAllowed = requestCounter.canMakeRequest()
+        if (!isRequestAllowed) {
+          const errorDetails = errorMapper(AppError.REQUEST_LIMIT_REACHED)
+          res.status(errorDetails.status).json({
+            status: 'error',
+            name: errorDetails.name,
+            message: errorDetails.message,
+          })
+          return
+        }
         // Normal flow, continue to the original handler
         next()
         return
+      }
       case 'fake_success':
         // Change the path and forward to fake success handler
         req.url = '/api/icebreaker-messages/fake-success'

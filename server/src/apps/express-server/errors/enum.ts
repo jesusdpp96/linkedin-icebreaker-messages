@@ -5,6 +5,7 @@
 export enum AppError {
   // icebreaker-messages route
   MISSING_LINKEDIN_API_KEY = 'missing-linkedin-api-key',
+  REQUEST_LIMIT_REACHED = 'request-limit-reached',
   // development-only middleware
   MISSING_ENVIRONMENT_DEFINITION = 'missing-environment-definition',
   ROUTE_NOT_AVAILABLE = 'route-not-available',

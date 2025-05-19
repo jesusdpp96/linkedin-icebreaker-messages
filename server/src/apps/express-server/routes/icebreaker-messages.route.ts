@@ -82,8 +82,10 @@ import {
 } from '@features/icebreaker-messages-request'
 import { config } from '../config'
 import { AppError, errorMapper } from '../errors'
+import { RequestCounter } from '../utils'
 
 const router = Router()
+const requestCounter = RequestCounter.getInstance('/api/icebreaker-messages')
 
 router.post('/icebreaker-messages', async (req: Request, res: Response) => {
   const { senderUrl, problemDescription, solutionDescription, receiverUrl } = req.body
@@ -147,6 +149,8 @@ router.post('/icebreaker-messages', async (req: Request, res: Response) => {
       })
       return
     }
+    // update request counter to limit the number of requests (server protection logic)
+    requestCounter.handleRequest()
     // present success response
     res.status(200).send({
       status: 'success',
