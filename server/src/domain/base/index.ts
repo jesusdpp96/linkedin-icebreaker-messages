@@ -1,1 +1,2 @@
-export * from './primitive-method'
+export * from './to-json-method'
+export * from './errors'

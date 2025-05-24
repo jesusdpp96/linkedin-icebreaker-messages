@@ -1,4 +1,4 @@
-export interface PrimitiveMethod<T> {
+export interface ToJsonMethod<T> {
   // to get the primitive value of the object (raw value)
-  toPrimitive(): T
+  toJSON(): T
 }
