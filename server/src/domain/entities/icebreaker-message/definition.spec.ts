@@ -1,81 +1,96 @@
-import { Err, Ok } from 'ts-results'
+import { describe, it, expect } from '@jest/globals'
 import { IcebreakerMessage } from './definition'
-import type { Payload } from './payload'
+import { RuleValidationError } from '../../base'
 
-function createValidPayload(): Payload {
-  return {
-    message: 'Hello, this is an icebreaker message.',
-    templateTitle: 'Friendly Greeting',
-    templateCategory: 'Networking',
-    instruction: 'Use this message to start a conversation.',
-    sourcePosts: ['https://example.com/post1', 'https://example.com/post2'],
-    receiverName: 'Jane Doe',
+describe('IcebreakerMessage', () => {
+  const validPayload = {
+    message: 'A'.repeat(100),
+    templateTitle: 'Valid Title',
+    templateCategory: 'Valid Category',
+    instruction: 'A'.repeat(100),
+    sourcePosts: ['post1', 'post2'],
+    receiverName: 'Receiver',
     receiverProfilePicture: 'https://example.com/receiver.jpg',
-    receiverHeadline: 'Product Manager at Tech Corp',
-    senderName: 'John Smith',
+    receiverHeadline: 'Receiver Headline',
+    senderName: 'Sender',
     senderProfilePicture: 'https://example.com/sender.jpg',
-    senderHeadline: 'Software Engineer at Dev Inc',
+    senderHeadline: 'Sender Headline',
   }
-}
 
-describe('IcebreakerMessage.of()', () => {
-  it('should create a valid IcebreakerMessage instance with correct payload', () => {
-    const payload = createValidPayload()
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should create an instance with valid payload', () => {
+    const instance = IcebreakerMessage.create(validPayload)
+    expect(instance).toBeInstanceOf(IcebreakerMessage)
+    expect(instance.message).toBe(validPayload.message)
   })
 
-  it('should accept empty message', () => {
-    const payload = { ...createValidPayload(), message: '' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should crop message exceeding max length', () => {
+    const payload = { ...validPayload, message: 'A'.repeat(600) }
+    const instance = IcebreakerMessage.create(payload)
+    expect(instance.message.length).toBe(500)
   })
 
-  it('should accept empty templateTitle', () => {
-    const payload = { ...createValidPayload(), templateTitle: '' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should throw an error for message below min length', () => {
+    const payload = { ...validPayload, message: 'Short' }
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
   })
 
-  it('should accept empty templateCategory', () => {
-    const payload = { ...createValidPayload(), templateCategory: '' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should crop instruction exceeding max length', () => {
+    const payload = { ...validPayload, instruction: 'A'.repeat(600) }
+    const instance = IcebreakerMessage.create(payload)
+    expect(instance.instruction.length).toBe(500)
   })
 
-  it('should accept empty instruction', () => {
-    const payload = { ...createValidPayload(), instruction: '' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should throw an error for invalid URL in receiverProfilePicture', () => {
+    const payload = { ...validPayload, receiverProfilePicture: 'invalid-url' }
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
   })
 
-  it('should accept sourcePosts with invalid URLs', () => {
-    const payload = { ...createValidPayload(), sourcePosts: ['not-a-url'] }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should crop receiverName exceeding max length', () => {
+    const payload = { ...validPayload, receiverName: 'A'.repeat(200) }
+    const instance = IcebreakerMessage.create(payload)
+    expect(instance.receiverName.length).toBe(100)
   })
 
-  it('should accept empty receiverName', () => {
-    const payload = { ...createValidPayload(), receiverName: '' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should crop senderName exceeding max length', () => {
+    const payload = { ...validPayload, senderName: 'A'.repeat(200) }
+    const instance = IcebreakerMessage.create(payload)
+    expect(instance.senderName.length).toBe(100)
   })
 
-  it('should accept receiverProfilePicture with invalid URL', () => {
-    const payload = { ...createValidPayload(), receiverProfilePicture: 'not-a-url' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should crop receiverHeadline exceeding max length', () => {
+    const payload = { ...validPayload, receiverHeadline: 'A'.repeat(300) }
+    const instance = IcebreakerMessage.create(payload)
+    expect(instance.receiverHeadline.length).toBe(200)
   })
 
-  it('should accept empty senderName', () => {
-    const payload = { ...createValidPayload(), senderName: '' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should crop senderHeadline exceeding max length', () => {
+    const payload = { ...validPayload, senderHeadline: 'A'.repeat(300) }
+    const instance = IcebreakerMessage.create(payload)
+    expect(instance.senderHeadline.length).toBe(200)
   })
 
-  it('should accept senderProfilePicture with invalid URL', () => {
-    const payload = { ...createValidPayload(), senderProfilePicture: 'not-a-url' }
-    const result = IcebreakerMessage.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should throw an error for templateTitle below min length', () => {
+    const payload = { ...validPayload, templateTitle: '' }
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
+  })
+
+  it('should throw an error for templateCategory below min length', () => {
+    const payload = { ...validPayload, templateCategory: '' }
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
+  })
+
+  it('should throw an error for receiverName below min length', () => {
+    const payload = { ...validPayload, receiverName: '' }
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
+  })
+
+  it('should throw an error for senderName below min length', () => {
+    const payload = { ...validPayload, senderName: '' }
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
+  })
+
+  it('should throw an error for instruction below min length', () => {
+    const payload = { ...validPayload, instruction: '' }
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
   })
 })
