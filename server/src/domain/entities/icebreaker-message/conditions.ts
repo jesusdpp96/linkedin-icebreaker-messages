@@ -7,7 +7,13 @@ import { cropString } from '../../zod-utils'
  * for the properties to ensure they meet the required conditions.
  */
 export const conditions = z.object({
-  message: z.string().min(100).max(500),
+  /**
+   * The message should be a concise summary of the icebreaker message.
+   * It is important for the AI to understand that it must generate a message
+   * in a maximum of 300 characters. Therefore, the prompt must ensure that the AI
+   * does not generate more than 300 characters.
+   */
+  message: z.string().min(100).max(300),
   templateTitle: z.string().min(1),
   templateCategory: z.string().min(1),
   instruction: z.string().min(1).max(500),
@@ -29,9 +35,6 @@ export const conditions = z.object({
  * but the message exceeds 500, it is cropped to 500 (this makes sense).
  */
 export class AdjustToConditions {
-  public static overMessage(message: string): string {
-    return cropString(conditions.shape.message, message)
-  }
   public static overInstruction(instruction: string): string {
     return cropString(conditions.shape.instruction, instruction)
   }
@@ -54,7 +57,6 @@ export class AdjustToConditions {
   public static apply(payload: z.infer<typeof conditions>): z.infer<typeof conditions> {
     return {
       ...payload,
-      message: AdjustToConditions.overMessage(payload.message),
       instruction: AdjustToConditions.overInstruction(payload.instruction),
       receiverName: AdjustToConditions.overReceiverName(payload.receiverName),
       senderName: AdjustToConditions.overSenderName(payload.senderName),

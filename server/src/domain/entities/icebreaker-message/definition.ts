@@ -4,7 +4,7 @@ import type { Payload } from './payload'
 
 export class IcebreakerMessage implements ToJsonMethod<Payload> {
   /**
-   * Only can be created by the static method `of`
+   * Only can be created by the static method `create`
    */
   private constructor(
     public message: string,
