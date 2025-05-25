@@ -1,12 +1,10 @@
-import type { Result } from 'ts-results'
-import { Err, Ok } from 'ts-results'
-import type { PrimitiveMethod } from '../../base'
-import { conditions } from './conditions'
+import { RuleValidationError, type ToJsonMethod } from '../../base'
+import { AdjustToConditions, conditions } from './conditions'
 import type { Payload } from './payload'
 
-export class Post implements PrimitiveMethod<Payload> {
+export class Post implements ToJsonMethod<Payload> {
   /**
-   * Only can be created by the static method `of`
+   * Only can be created by the static method `create`
    */
 
   private constructor(
@@ -23,28 +21,26 @@ export class Post implements PrimitiveMethod<Payload> {
    * Method to create a Post instance
    * Apply the conditions to the payload
    */
-  public static of(payload: Payload): Result<Post, Error> {
-    const parse = conditions.safeParse(payload)
+  public static create(payload: Payload): Post {
+    const adjustedPayload = AdjustToConditions.apply(payload)
+    const parse = conditions.safeParse(adjustedPayload)
 
     if (!parse.success) {
-      const newParse = JSON.parse(JSON.stringify(parse))
-      newParse.domain = `Post`
-      return Err(new Error(JSON.stringify(newParse)))
+      const creationError = new RuleValidationError(Post.name, { issues: parse.error.issues })
+      throw creationError
     }
 
-    return Ok(
-      new Post(
-        parse.data.id,
-        parse.data.postedContent,
-        parse.data.publicationUrl,
-        parse.data.postedDate,
-        parse.data.authorUsername,
-        parse.data.hasMediaContent,
-      ),
+    return new Post(
+      parse.data.id,
+      parse.data.postedContent,
+      parse.data.publicationUrl,
+      parse.data.postedDate,
+      parse.data.authorUsername,
+      parse.data.hasMediaContent,
     )
   }
 
-  public toPrimitive(): Payload {
+  public toJSON(): Payload {
     return {
       id: this.id,
       postedContent: this.postedContent,

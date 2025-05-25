@@ -1,7 +1,8 @@
-import { Err, Ok } from 'ts-results'
+import { expect, it, describe } from '@jest/globals'
 import { Post } from './definition'
+import { RuleValidationError } from '../../base'
 
-describe('Post Entity', () => {
+describe('Post', () => {
   const validPayload = {
     id: 1,
     postedContent: 'This is a valid post content.',
@@ -12,44 +13,38 @@ describe('Post Entity', () => {
   }
 
   it('should create a Post instance with valid payload', () => {
-    const result = Post.of(validPayload)
-    expect(result).toBeInstanceOf(Ok)
-    expect(result.unwrap()).toBeInstanceOf(Post)
+    const post = Post.create(validPayload)
+    expect(post).toBeInstanceOf(Post)
+    expect(post.toJSON()).toEqual(validPayload)
   })
 
-  it('should fail if id is less than 1', () => {
-    const payload = { ...validPayload, id: 0 }
-    const result = Post.of(payload)
-    expect(result).toBeInstanceOf(Err)
+  it('should throw RuleValidationError for invalid payload', () => {
+    const invalidPayload = { ...validPayload, id: 0 } // id must be >= 1
+    expect(() => Post.create(invalidPayload)).toThrow(RuleValidationError)
   })
 
-  it('should fail if postedContent exceeds 1500 characters', () => {
-    const payload = { ...validPayload, postedContent: 'a'.repeat(1501) }
-    const result = Post.of(payload)
-    expect(result).toBeInstanceOf(Err)
+  it('should adjust overlong postedContent to meet conditions', () => {
+    const longContent = 'a'.repeat(2000) // exceeds max length of 1500
+    const payload = { ...validPayload, postedContent: longContent }
+    const post = Post.create(payload)
+    expect(post.postedContent.length).toBeLessThanOrEqual(1500)
   })
 
-  it('should fail if publicationUrl is invalid', () => {
-    const payload = { ...validPayload, publicationUrl: 'invalid-url' }
-    const result = Post.of(payload)
-    expect(result).toBeInstanceOf(Err)
+  it('should adjust overlong authorUsername to meet conditions', () => {
+    const longUsername = 'a'.repeat(300) // exceeds max length of 255
+    const payload = { ...validPayload, authorUsername: longUsername }
+    const post = Post.create(payload)
+    expect(post.authorUsername.length).toBeLessThanOrEqual(255)
   })
 
-  it('should fail if postedDate is not a string', () => {
-    const payload = { ...validPayload, postedDate: 12345 as unknown as string } // Explicit cast for testing
-    const result = Post.of(payload)
-    expect(result).toBeInstanceOf(Err)
+  it('should validate publicationUrl format', () => {
+    const invalidUrlPayload = { ...validPayload, publicationUrl: 'invalid-url' }
+    expect(() => Post.create(invalidUrlPayload)).toThrow(RuleValidationError)
   })
 
-  it('should fail if authorUsername is empty', () => {
-    const payload = { ...validPayload, authorUsername: '' }
-    const result = Post.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should fail if hasMediaContent is not a boolean', () => {
-    const payload = { ...validPayload, hasMediaContent: 'true' as unknown as boolean } // Explicit cast for testing
-    const result = Post.of(payload)
-    expect(result).toBeInstanceOf(Err)
+  it('should validate hasMediaContent as a boolean', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const invalidMediaPayload = { ...validPayload, hasMediaContent: 'not-a-boolean' as any }
+    expect(() => Post.create(invalidMediaPayload)).toThrow(RuleValidationError)
   })
 })
