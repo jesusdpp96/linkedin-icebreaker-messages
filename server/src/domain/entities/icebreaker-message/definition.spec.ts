@@ -23,10 +23,9 @@ describe('IcebreakerMessage', () => {
     expect(instance.message).toBe(validPayload.message)
   })
 
-  it('should crop message exceeding max length', () => {
+  it('should throw an error for message exceeding max length', () => {
     const payload = { ...validPayload, message: 'A'.repeat(600) }
-    const instance = IcebreakerMessage.create(payload)
-    expect(instance.message.length).toBe(500)
+    expect(() => IcebreakerMessage.create(payload)).toThrow(RuleValidationError)
   })
 
   it('should throw an error for message below min length', () => {

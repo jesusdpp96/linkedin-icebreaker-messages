@@ -1,5 +1,13 @@
 import type { z } from 'zod'
 
+/**
+ * Extracts the first matched substring from a string based on the provided ZodString rules.
+ * If the value is not a string, it returns the original value.
+ * If the rules do not contain a regex check, it returns the original value.
+ * If the regex check is present, it applies the regex to the value and returns the first match.
+ * @param rules
+ * @param value
+ */
 export function extractMatchedRegexp(rules: z.ZodString, value: string): string {
   if (typeof value !== 'string') {
     return value

@@ -1,5 +1,13 @@
 import type { z } from 'zod'
 
+/**
+ * Crops a string to fit the specified ZodString rules.
+ * If value is not a string, it returns the original value.
+ * If the string is shorter than the minimum length, it returns the original string.
+ * If it exceeds the maximum length, it truncates the string to the maximum length.
+ * @param rules
+ * @param value
+ */
 export function cropString(rules: z.ZodString, value: string): string {
   if (typeof value !== 'string') {
     return value
