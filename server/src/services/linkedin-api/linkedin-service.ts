@@ -1,3 +1,4 @@
+import { ExternalServiceError } from 'domain/base'
 import { ApiClient } from './api-client'
 import type {
   LinkedInApiConfig,
@@ -156,19 +157,9 @@ export class LinkedInService {
     methodName: string,
     operation: () => Promise<T>,
   ): Promise<T> {
-    try {
-      const result = await operation()
-      this.trackCreditUsage(methodName, true)
-      return result
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error(`Error en ${methodName}:`, error)
-      if (error.status === 429) {
-        const newError = new Error('linkedin_api_rate_limit')
-        throw newError
-      }
-      throw error
-    }
+    const result = await operation()
+    this.trackCreditUsage(methodName, true)
+    return result
   }
 
   /**
@@ -180,12 +171,29 @@ export class LinkedInService {
    */
   async getProfileDataByUrl(url: string): Promise<ProfileData> {
     if (!url) {
-      throw new Error('URL is required')
+      throw new ExternalServiceError(LinkedInService.name, 'linkedin_api_url_required', {
+        function: this.getProfileDataByUrl.name,
+        params: `url: ${url}`,
+      })
     }
 
-    return this.executeWithTracking('getProfileDataByUrl', () =>
-      this.client.get<ProfileData>('/get-profile-data-by-url', { url }),
-    )
+    try {
+      const result = await this.executeWithTracking(this.getProfileDataByUrl.name, () =>
+        this.client.get<ProfileData>('/get-profile-data-by-url', { url }),
+      )
+      return result
+    } catch (error) {
+      throw new ExternalServiceError(
+        LinkedInService.name,
+        'linkedin_api_error',
+        {
+          function: this.getProfileDataByUrl.name,
+          params: `url: ${url}`,
+        },
+        500,
+        error as Error,
+      )
+    }
   }
 
   /**
@@ -210,13 +218,30 @@ export class LinkedInService {
     },
   ): Promise<ProfilePostsResponse> {
     if (!username) {
-      throw new Error('Username is required')
+      throw new ExternalServiceError(LinkedInService.name, 'linkedin_api_username_required', {
+        function: this.getProfilePosts.name,
+        params: `username: ${username}`,
+      })
     }
 
-    const params = { username, ...options }
-    return this.executeWithTracking('getProfilePosts', () =>
-      this.client.get<ProfilePostsResponse>('/get-profile-posts', params),
-    )
+    try {
+      const params = { username, ...options }
+      const result = await this.executeWithTracking(this.getProfilePosts.name, () =>
+        this.client.get<ProfilePostsResponse>('/get-profile-posts', params),
+      )
+      return result
+    } catch (error) {
+      throw new ExternalServiceError(
+        LinkedInService.name,
+        'linkedin_api_error',
+        {
+          function: this.getProfilePosts.name,
+          params: `username: ${username}, options: ${JSON.stringify(options)}`,
+        },
+        500,
+        error as Error,
+      )
+    }
   }
 
   /**
@@ -235,13 +260,29 @@ export class LinkedInService {
     },
   ): Promise<ProfileReactionsResponse> {
     if (!username) {
-      throw new Error('Username is required')
+      throw new ExternalServiceError(LinkedInService.name, 'linkedin_api_username_required', {
+        function: this.getProfileReactions.name,
+        params: `username: ${username}`,
+      })
     }
-
-    const params = { username, ...options }
-    return this.executeWithTracking('getProfileReactions', () =>
-      this.client.get<ProfileReactionsResponse>('/get-profile-likes', params),
-    )
+    try {
+      const params = { username, ...options }
+      const result = await this.executeWithTracking(this.getProfileReactions.name, () =>
+        this.client.get<ProfileReactionsResponse>('/get-profile-likes', params),
+      )
+      return result
+    } catch (error) {
+      throw new ExternalServiceError(
+        LinkedInService.name,
+        'linkedin_api_error',
+        {
+          function: this.getProfileReactions.name,
+          params: `username: ${username}, options: ${JSON.stringify(options)}`,
+        },
+        500,
+        error as Error,
+      )
+    }
   }
 
   /**
@@ -253,10 +294,12 @@ export class LinkedInService {
    */
   async getProfileComments(username: string): Promise<ProfileCommentsResponse> {
     if (!username) {
-      throw new Error('Username is required')
+      throw new ExternalServiceError(LinkedInService.name, 'linkedin_api_username_required', {
+        function: this.getProfileComments.name,
+        params: `username: ${username}`,
+      })
     }
-
-    return this.executeWithTracking('getProfileComments', () =>
+    return this.executeWithTracking(this.getProfileComments.name, () =>
       this.client.get<ProfileCommentsResponse>('/get-profile-comments', { username }),
     )
   }

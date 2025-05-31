@@ -1,13 +1,13 @@
-import type { InputDto } from '../../use-case'
-import { UseCase } from '../../use-case'
-import type { ServiceDriverPort } from '../service'
-import { ServiceAdapter } from '../service'
-import type { PresenterDriverPort } from '../presenter'
-import { PresenterAdapter } from '../presenter'
-import type { RepositoryDriverPort } from '../repository'
-import { RepositoryAdapter } from '../repository'
+import type { InputDto } from './use-case/input.dto'
+import { UseCase } from './use-case'
+import type { PresenterDriverPort } from './use-case/adapters/presenter'
+import { PresenterAdapter } from './use-case/adapters/presenter'
+import type { RepositoryDriverPort } from './use-case/adapters/repository'
+import { RepositoryAdapter } from './use-case/adapters/repository'
+import type { ServiceDriverPort } from './use-case/adapters/service'
+import { ServiceAdapter } from './use-case/adapters/service'
 
-export class Adapter {
+export class Controller {
   constructor(
     private serviceDriver: ServiceDriverPort,
     private repositoryDriver: RepositoryDriverPort,

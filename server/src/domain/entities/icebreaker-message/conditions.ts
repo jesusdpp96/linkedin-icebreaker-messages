@@ -17,7 +17,7 @@ export const conditions = z.object({
   templateTitle: z.string().min(1),
   templateCategory: z.string().min(1),
   instruction: z.string().min(1).max(500),
-  sourcePosts: z.array(z.string()),
+  sourcePosts: z.array(z.number()),
   receiverName: z.string().min(1).max(100),
   receiverProfilePicture: z.string().url(),
   receiverHeadline: z.string().max(200),

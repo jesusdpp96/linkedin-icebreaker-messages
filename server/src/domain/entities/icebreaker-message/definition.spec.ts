@@ -8,7 +8,7 @@ describe('IcebreakerMessage', () => {
     templateTitle: 'Valid Title',
     templateCategory: 'Valid Category',
     instruction: 'A'.repeat(100),
-    sourcePosts: ['post1', 'post2'],
+    sourcePosts: [1, 2],
     receiverName: 'Receiver',
     receiverProfilePicture: 'https://example.com/receiver.jpg',
     receiverHeadline: 'Receiver Headline',

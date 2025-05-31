@@ -96,4 +96,9 @@ export class PromptBuilder implements ToJsonMethod<PromptJson> {
     }
     return context.generatePrompts(numberOfMessages)
   }
+
+  public getSenderPostUrl(postId: number): string {
+    const post = this.senderPosts.find(p => p.id === postId)
+    return post?.publicationUrl || ''
+  }
 }

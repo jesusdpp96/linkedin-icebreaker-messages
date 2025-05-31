@@ -1,1 +1,6 @@
 export { RuleValidationError } from './rule-validation.error'
+export { ExternalServiceError } from './external-service.error'
+export type { ErrorsCollection } from './collection'
+export { isErrorsCollection } from './is-errors-collection'
+export { CatchedInAdapter } from './catched-in-adapter'
+export { BaseErrorAsJSON } from './base.error'

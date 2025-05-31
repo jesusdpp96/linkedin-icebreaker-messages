@@ -11,7 +11,7 @@ export class IcebreakerMessage implements ToJsonMethod<Payload> {
     public templateTitle: string,
     public templateCategory: string,
     public instruction: string,
-    public sourcePosts: string[],
+    public sourcePosts: number[],
     public receiverName: string,
     public receiverProfilePicture: string,
     public receiverHeadline: string,

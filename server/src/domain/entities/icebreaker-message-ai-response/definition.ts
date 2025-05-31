@@ -11,7 +11,7 @@ export class IcebreakerMessageAiResponse implements ToJsonMethod<Payload> {
     public templateTitle: string,
     public templateCategory: string,
     public instruction: string,
-    public sourcePosts: string[],
+    public sourcePosts: number[],
   ) {
     // empty
   }

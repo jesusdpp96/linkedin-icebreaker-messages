@@ -1,3 +1,3 @@
-export * from './api-rest-response'
+export * from './rest-response'
 export * from './apis'
-export * from './in-ram-db'
+export * from './in-memory'
