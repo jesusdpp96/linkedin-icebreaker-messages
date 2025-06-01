@@ -113,10 +113,11 @@ export class ServiceAdapter {
     shot: PromptShot,
   ): Promise<Result<IcebreakerMessageAiResponse[], ErrorsCollection>> {
     try {
-      const response = await this.driver.askToAI(shot.prompt, [
-        ...shot.attachments,
+      const response = await this.driver.askToAI(
+        shot.prompt,
+        [...shot.attachments],
         shot.responseJsonSchema,
-      ])
+      )
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dataArr: any[] = JSON.parse(response)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

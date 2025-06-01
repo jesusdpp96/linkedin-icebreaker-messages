@@ -25,6 +25,8 @@ export class CatchedInAdapter {
     }
   }
 
+  public static CATCHED_IN_ADAPTER = 'cached_in_adapter'
+
   setStrategy(strategy: ErrorStrategy): void {
     this.strategy = strategy
   }

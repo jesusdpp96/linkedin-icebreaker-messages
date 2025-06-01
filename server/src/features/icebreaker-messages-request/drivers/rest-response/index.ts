@@ -1,1 +1,1 @@
-export { Driver as ApiRestResponseDriver } from './driver'
+export { Driver as RestResponseDriver } from './driver'

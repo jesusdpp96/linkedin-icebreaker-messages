@@ -40,6 +40,7 @@
     "express": "^5.1.0",
     "module-alias": "^2.2.3",
     "npm": "^11.4.1",
+    "openai": "^5.0.1",
     "ts-results": "^3.3.0",
     "zod": "^3.24.4",
     "zod-to-json-schema": "^3.24.5"

@@ -94,7 +94,7 @@ export class Driver implements ServiceDriverPort {
     return reactionsPayload
   }
   public async askToAI(prompt: string, jsonsAsAttachment: string[]): Promise<string> {
-    const response = await this.servicePort.openaiService.sendMessage({
+    const response = await this.servicePort.openaiService.getStructuredResponse({
       prompt,
       jsonInputs: jsonsAsAttachment,
     })

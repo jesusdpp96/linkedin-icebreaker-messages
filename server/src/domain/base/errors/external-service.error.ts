@@ -3,6 +3,7 @@ import { BaseError } from './base.error'
 interface Metadata {
   function: string
   params: string
+  message?: string
 }
 
 export class ExternalServiceError extends BaseError<Metadata> {

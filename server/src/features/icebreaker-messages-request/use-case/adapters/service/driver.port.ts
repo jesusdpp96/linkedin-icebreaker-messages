@@ -10,5 +10,9 @@ export interface ServiceDriverPort {
   getPosts(username: string): Promise<PostPayload[]>
   getComments(username: string): Promise<SenderCommentPayload[]>
   getReactions(username: string): Promise<ReceiverReactionPayload[]>
-  askToAI(prompt: string, jsonsAsAttachment: string[]): Promise<string>
+  askToAI(
+    prompt: string,
+    jsonsAsAttachment: string[],
+    structuredResponseSchema: string,
+  ): Promise<string>
 }
