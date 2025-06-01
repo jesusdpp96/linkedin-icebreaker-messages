@@ -60,32 +60,11 @@ export const icebreakerMessagesHandler = async (req: Request, res: Response) => 
     /**
      * Presenting response
      */
-    if (presenterDriver.isError) {
-      // present error response
-      const errorDetails = {
-        status: 'error',
-        name: presenterDriver.error?.code || 'unexpected_error',
-        message: `${presenterDriver.error?.message}`,
-        metadata: presenterDriver.error?.metadata ? presenterDriver.error?.metadata : {},
-        additionalErrors: presenterDriver.error?.additionalErrors
-          ? presenterDriver.error?.additionalErrors
-          : [],
-      }
-      if (presenterDriver.error?.cause) {
-        errorDetails.message += ` - ${presenterDriver.error.cause}`
-      }
-      res.status(presenterDriver.error?.statusCode || 500).send(errorDetails)
-      return
+    if (!presenterDriver.isError) {
+      // Counting request for rate limiting
+      requestCounter.handleRequest()
     }
-    // update request counter to limit the number of requests (server protection logic)
-    requestCounter.handleRequest()
-    // present success response
-    res.status(200).send({
-      status: 'success',
-      data: presenterDriver.data,
-    })
-    return
-
+    presenterDriver.sendResponse(res)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     const errorDetails = errorMapper(err.message)

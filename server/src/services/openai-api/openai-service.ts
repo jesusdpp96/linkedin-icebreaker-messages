@@ -30,7 +30,11 @@ export class OpenAIResponsesService {
    * @param options Prompt, optional JSON inputs, and optional previous response ID for continuation
    * @returns The response object from OpenAI
    */
-  public async getStructuredResponse(options: ChatRequestOptions): Promise<string> {
+  public async getStructuredResponse(
+    options: Omit<ChatRequestOptions, 'structuredResponseSchema'> & {
+      structuredResponseSchema: string
+    },
+  ): Promise<string> {
     const userMessage = this.formatUserMessage(options.prompt, options.jsonInputs)
 
     const params: ResponseCreateParams = {
@@ -47,11 +51,8 @@ export class OpenAIResponsesService {
         },
         { role: 'user', content: userMessage },
       ],
-    }
-
-    if (options.structuredResponseSchema) {
-      params.tool_choice = 'auto'
-      params.tools = [
+      tool_choice: 'auto',
+      tools: [
         {
           type: 'function',
           name: 'structured_response',
@@ -59,7 +60,7 @@ export class OpenAIResponsesService {
           parameters: JSON.parse(options.structuredResponseSchema),
           strict: false,
         },
-      ]
+      ],
     }
 
     const response: Response = await this.client.responses.create(params)

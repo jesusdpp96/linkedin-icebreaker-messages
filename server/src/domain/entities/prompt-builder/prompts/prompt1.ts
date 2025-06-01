@@ -32,9 +32,11 @@ export function prompt1(
       7. Sigue la estructura definida por los templates proporcionados, sin mencionar explícitamente que estás usando templates.
 
       FORMATO DE RESPUESTA:
-      Devuelve exactamente ${
+      Devuelve una respuesta estructurada de exactamente ${
         numberOfMessages === 1 ? '1 mensaje' : `${numberOfMessages} mensajes`
-      } en formato JSON, donde cada mensaje siga la estructura del interface IcebreakerMessage:
+      } en formato JSON, donde cada mensaje siga la estructura del json-schema proporcionado, asegurate que siempre sea un array de objetos aunque sea un solo mensaje.
+
+      A continuación, un ejemplo de cómo debe ser la respuesta:
 
       [
         {
@@ -42,7 +44,7 @@ export function prompt1(
           "templateTitle": "Título del template usado como inspiración",
           "templateCategory": "Categoría del template",
           "instruction": "Instrucciones que me recomiendas seguir antes de enviar el mensaje (si es necesario dar un like o hacer un comentario en una publicación del destinatario, etc.)",
-          "sourcePosts": ["URLs de los posts/reactions que fueron usados como referencia"]
+          "sourcePosts": [Identificadores (ids: number[]) de los posts que fueron usados como referencia]
         },
         {...},
         {...}
