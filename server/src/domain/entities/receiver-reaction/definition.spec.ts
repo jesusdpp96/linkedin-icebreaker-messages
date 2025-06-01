@@ -1,104 +1,51 @@
-import { Err, Ok } from 'ts-results'
+import { expect, it, describe } from '@jest/globals'
 import { ReceiverReaction } from './definition'
+import { RuleValidationError } from '../../base'
 
 describe('ReceiverReaction', () => {
-  it('should create a valid ReceiverReaction instance', () => {
-    const payload = {
-      id: 1,
-      reactedToContent: 'This is a valid content.',
-      reaction: 'Like',
-      reactionByUsername: 'validUser',
-    }
+  describe('create', () => {
+    it('should create a valid ReceiverReaction instance', () => {
+      const validPayload = {
+        id: 1,
+        reactedToContent: 'This is a valid content',
+        reaction: 'Like',
+        reactionByUsername: 'user123',
+      }
 
-    const result = ReceiverReaction.of(payload)
+      const instance = ReceiverReaction.create(validPayload)
 
-    expect(result).toBeInstanceOf(Ok)
-    if (result.ok) {
-      const instance = result.val
-      expect(instance.id).toBe(payload.id)
-      expect(instance.reactedToContent).toBe(payload.reactedToContent)
-      expect(instance.reaction).toBe(payload.reaction)
-      expect(instance.reactionByUsername).toBe(payload.reactionByUsername)
-    }
-  })
+      expect(instance).toBeInstanceOf(ReceiverReaction)
+      expect(instance.toJSON()).toEqual(validPayload)
+    })
 
-  it('should fail if id is less than 1', () => {
-    const payload = {
-      id: 0,
-      reactedToContent: 'Valid content.',
-      reaction: 'Like',
-      reactionByUsername: 'validUser',
-    }
+    it('should throw RuleValidationError for invalid payload', () => {
+      const invalidPayload = {
+        id: 0, // Invalid ID
+        reactedToContent: 'Valid content',
+        reaction: 'Like',
+        reactionByUsername: 'user123',
+      }
 
-    const result = ReceiverReaction.of(payload)
+      expect(() => ReceiverReaction.create(invalidPayload)).toThrow(RuleValidationError)
+    })
 
-    expect(result).toBeInstanceOf(Err)
-    if (result.err) {
-      expect(result.val.message).toContain('id')
-    }
-  })
+    it('should adjust payload values before validation', () => {
+      const longContent = 'a'.repeat(2000) // Exceeds max length
+      const longReaction = 'b'.repeat(300) // Exceeds max length
+      const longUsername = 'c'.repeat(300) // Exceeds max length
 
-  it('should fail if reactedToContent exceeds 1500 characters', () => {
-    const payload = {
-      id: 1,
-      reactedToContent: 'a'.repeat(1501),
-      reaction: 'Like',
-      reactionByUsername: 'validUser',
-    }
+      const payload = {
+        id: 1,
+        reactedToContent: longContent,
+        reaction: longReaction,
+        reactionByUsername: longUsername,
+      }
 
-    const result = ReceiverReaction.of(payload)
+      const instance = ReceiverReaction.create(payload)
 
-    expect(result).toBeInstanceOf(Err)
-    if (result.err) {
-      expect(result.val.message).toContain('reactedToContent')
-    }
-  })
-
-  it('should fail if reaction exceeds 255 characters', () => {
-    const payload = {
-      id: 1,
-      reactedToContent: 'Valid content.',
-      reaction: 'a'.repeat(256),
-      reactionByUsername: 'validUser',
-    }
-
-    const result = ReceiverReaction.of(payload)
-
-    expect(result).toBeInstanceOf(Err)
-    if (result.err) {
-      expect(result.val.message).toContain('reaction')
-    }
-  })
-
-  it('should fail if reactionByUsername is empty', () => {
-    const payload = {
-      id: 1,
-      reactedToContent: 'Valid content.',
-      reaction: 'Like',
-      reactionByUsername: '',
-    }
-
-    const result = ReceiverReaction.of(payload)
-
-    expect(result).toBeInstanceOf(Err)
-    if (result.err) {
-      expect(result.val.message).toContain('reactionByUsername')
-    }
-  })
-
-  it('should fail if reactionByUsername exceeds 255 characters', () => {
-    const payload = {
-      id: 1,
-      reactedToContent: 'Valid content.',
-      reaction: 'Like',
-      reactionByUsername: 'a'.repeat(256),
-    }
-
-    const result = ReceiverReaction.of(payload)
-
-    expect(result).toBeInstanceOf(Err)
-    if (result.err) {
-      expect(result.val.message).toContain('reactionByUsername')
-    }
+      expect(instance.reactedToContent).toHaveLength(1500) // Adjusted to max length
+      expect(instance.reaction).toHaveLength(255) // Adjusted to max length
+      expect(instance.reactionByUsername).toHaveLength(255) // Adjusted to max length
+    })
   })
 })

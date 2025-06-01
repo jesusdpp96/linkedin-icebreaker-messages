@@ -1,12 +1,10 @@
-import type { Result } from 'ts-results'
-import { Err, Ok } from 'ts-results'
-import type { PrimitiveMethod } from '../../base'
-import { conditions } from './conditions'
+import { RuleValidationError, type ToJsonMethod } from '../../base'
+import { AdjustToConditions, conditions } from './conditions'
 import type { Payload } from './payload'
 
-export class ReceiverReaction implements PrimitiveMethod<Payload> {
+export class ReceiverReaction implements ToJsonMethod<Payload> {
   /**
-   * Only can be created by the static method `of`
+   * Only can be created by the static method `create`
    */
   private constructor(
     public id: number,
@@ -20,26 +18,26 @@ export class ReceiverReaction implements PrimitiveMethod<Payload> {
    * Method to create a ReceiverReaction instance
    * Apply the conditions to the payload
    */
-  public static of(payload: Payload): Result<ReceiverReaction, Error> {
-    const parse = conditions.safeParse(payload)
+  public static create(payload: Payload): ReceiverReaction {
+    const adjustedPayload = AdjustToConditions.apply(payload)
+    const parse = conditions.safeParse(adjustedPayload)
 
     if (!parse.success) {
-      const newParse = JSON.parse(JSON.stringify(parse))
-      newParse.domain = `ReceiverReaction`
-      return Err(new Error(JSON.stringify(newParse)))
+      const creationError = new RuleValidationError(ReceiverReaction.name, {
+        issues: parse.error.issues,
+      })
+      throw creationError
     }
 
-    return Ok(
-      new ReceiverReaction(
-        parse.data.id,
-        parse.data.reactedToContent,
-        parse.data.reaction,
-        parse.data.reactionByUsername,
-      ),
+    return new ReceiverReaction(
+      parse.data.id,
+      parse.data.reactedToContent,
+      parse.data.reaction,
+      parse.data.reactionByUsername,
     )
   }
 
-  public toPrimitive(): Payload {
+  public toJSON(): Payload {
     return {
       id: this.id,
       reactedToContent: this.reactedToContent,

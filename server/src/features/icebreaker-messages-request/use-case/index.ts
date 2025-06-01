@@ -1,5 +1,3 @@
 export * from './use-case'
-export * from './service.port'
-export * from './presenter.port'
-export * from './repository.port'
-export * from './input.dto'
+export * from './adapters/service/driver.port'
+export * from './adapters/presenter/driver.port'

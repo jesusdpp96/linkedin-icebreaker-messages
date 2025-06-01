@@ -39,7 +39,7 @@
  */
 import type { Request, Response } from 'express'
 import { Router } from 'express'
-import { OpenAIChatService } from '@services'
+import { OpenAIResponsesService } from '@services'
 import { config } from '../config'
 import { AppError, errorMapper } from '../errors'
 
@@ -81,17 +81,13 @@ router.get('/openai-api', async (req: Request, res: Response) => {
     })
     return
   }
-
-  const openaiService = new OpenAIChatService({ apiKey, model })
-
+  const openaiService = new OpenAIResponsesService({ apiKey, model })
   try {
     const jsonInputs = json ? [json] : undefined
-
-    const response = await openaiService.sendMessage({
+    const response = await openaiService.getResponse({
       prompt,
       jsonInputs,
     })
-
     res.status(200).json({ status: 'success', data: response })
     return
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

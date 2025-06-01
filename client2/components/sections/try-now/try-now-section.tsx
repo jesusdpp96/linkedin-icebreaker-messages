@@ -54,7 +54,8 @@ export function TryNowSection() {
 
   // Validate LinkedIn URL
   const validateLinkedInUrl = (url: string): boolean => {
-    const regex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
+    const regex =
+      /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9%\-]+\/?/i;
     return regex.test(url);
   };
 

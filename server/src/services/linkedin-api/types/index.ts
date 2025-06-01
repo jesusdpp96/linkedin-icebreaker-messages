@@ -1,4 +1,3 @@
-export * from './api-error'
 export * from './api-config'
 export { ProfileComment, ProfileCommentsResponse } from './profile-comment'
 export { ProfileData, ProfileDataResponse } from './profile-data'

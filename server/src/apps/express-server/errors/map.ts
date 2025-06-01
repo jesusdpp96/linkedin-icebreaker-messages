@@ -101,4 +101,12 @@ export const MAP: {
     name: 'unexpected_error',
     message: '[ES App] An unexpected error occurred',
   },
+  /**
+   * features
+   */
+  [AppError.MISSING_FEATURE_ICEBREAKER_MESSAGES_STRATEGY]: {
+    status: 500,
+    name: 'missing_app_configuration',
+    message: '[ES App] Missing feature icebreaker messages strategy in app configuration',
+  },
 }

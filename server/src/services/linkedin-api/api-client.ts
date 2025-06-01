@@ -1,6 +1,6 @@
-import type { AxiosInstance, AxiosError } from 'axios'
+import type { AxiosInstance } from 'axios'
 import axios from 'axios'
-import type { LinkedInApiConfig, ApiError } from './types'
+import type { LinkedInApiConfig } from './types'
 
 export class ApiClient {
   private axiosInstance: AxiosInstance
@@ -17,20 +17,16 @@ export class ApiClient {
     })
   }
 
+  /**
+   * Makes a GET request to the LinkedIn API.
+   * @param endpoint The API endpoint to call.
+   * @param params Query parameters to include in the request.
+   * @returns The response data from the API.
+   * @throws AxiosError if the request fails.
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async get<T>(endpoint: string, params: Record<string, any> = {}): Promise<T> {
-    try {
-      const response = await this.axiosInstance.get<T>(endpoint, { params })
-      return response.data
-    } catch (error) {
-      const axiosError = error as AxiosError
-      const apiError: ApiError = {
-        status: axiosError.response?.status || 500,
-        message: axiosError.message,
-        originalError: error,
-      }
-
-      throw apiError
-    }
+    const response = await this.axiosInstance.get<T>(endpoint, { params })
+    return response.data
   }
 }

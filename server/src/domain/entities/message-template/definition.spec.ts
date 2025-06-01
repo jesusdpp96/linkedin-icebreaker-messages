@@ -1,47 +1,50 @@
-import { Err, Ok } from 'ts-results'
+import { describe, it, expect } from '@jest/globals'
 import { MessageTemplate } from './definition'
+import { RuleValidationError } from '../../base'
 
 describe('MessageTemplate', () => {
-  describe('of', () => {
-    it('should create a MessageTemplate instance for valid payload', () => {
-      const validPayload = {
-        id: 1,
-        title: 'Sample Title',
-        category: 'Sample Category',
-        instruction: 'Sample Instruction',
-        example: 'Sample Example',
-      }
+  const validPayload = {
+    id: 1,
+    title: 'Test Title',
+    category: 'Test Category',
+    instruction: 'Test Instruction',
+    example: 'This is a valid example message.',
+  }
 
-      const result = MessageTemplate.of(validPayload)
+  it('should create a MessageTemplate instance with valid payload', () => {
+    const template = MessageTemplate.create(validPayload)
+    expect(template).toBeInstanceOf(MessageTemplate)
+    expect(template.toJSON()).toEqual(validPayload)
+  })
 
-      expect(result).toBeInstanceOf(Ok)
-      if (result.ok) {
-        const template = result.val
-        expect(template.id).toBe(validPayload.id)
-        expect(template.title).toBe(validPayload.title)
-        expect(template.category).toBe(validPayload.category)
-        expect(template.instruction).toBe(validPayload.instruction)
-        expect(template.example).toBe(validPayload.example)
-      }
-    })
+  it('should throw RuleValidationError for invalid id', () => {
+    const invalidPayload = { ...validPayload, id: 0 }
+    expect(() => MessageTemplate.create(invalidPayload)).toThrow(RuleValidationError)
+  })
 
-    it('should return an error for invalid payload', () => {
-      const invalidPayload = {
-        id: -1, // Invalid id
-        title: 'Sample Title',
-        category: 'Sample Category',
-        instruction: 'Sample Instruction',
-        example: 'Sample Example',
-      }
+  it('should throw RuleValidationError for empty title', () => {
+    const invalidPayload = { ...validPayload, title: '' }
+    expect(() => MessageTemplate.create(invalidPayload)).toThrow(RuleValidationError)
+  })
 
-      const result = MessageTemplate.of(invalidPayload)
+  it('should throw RuleValidationError for empty category', () => {
+    const invalidPayload = { ...validPayload, category: '' }
+    expect(() => MessageTemplate.create(invalidPayload)).toThrow(RuleValidationError)
+  })
 
-      expect(result).toBeInstanceOf(Err)
-      if (!result.ok) {
-        const error = result.val
-        expect(error.message).toContain('MessageTemplate')
-        expect(error.message).toContain('id')
-      }
-    })
+  it('should throw RuleValidationError for empty instruction', () => {
+    const invalidPayload = { ...validPayload, instruction: '' }
+    expect(() => MessageTemplate.create(invalidPayload)).toThrow(RuleValidationError)
+  })
+
+  it('should throw RuleValidationError for example exceeding 300 characters', () => {
+    const longExample = 'a'.repeat(301)
+    const invalidPayload = { ...validPayload, example: longExample }
+    expect(() => MessageTemplate.create(invalidPayload)).toThrow(RuleValidationError)
+  })
+
+  it('should throw RuleValidationError for empty example', () => {
+    const invalidPayload = { ...validPayload, example: '' }
+    expect(() => MessageTemplate.create(invalidPayload)).toThrow(RuleValidationError)
   })
 })

@@ -1,19 +1,17 @@
-import type { Result } from 'ts-results'
-import { Err, Ok } from 'ts-results'
-import type { PrimitiveMethod } from '../../base'
-import { conditions } from './conditions'
+import { RuleValidationError, type ToJsonMethod } from '../../base'
+import { conditions, AdjustToConditions } from './conditions'
 import type { Payload } from './payload'
 
-export class IcebreakerMessage implements PrimitiveMethod<Payload> {
+export class IcebreakerMessage implements ToJsonMethod<Payload> {
   /**
-   * Only can be created by the static method `of`
+   * Only can be created by the static method `create`
    */
   private constructor(
     public message: string,
     public templateTitle: string,
     public templateCategory: string,
     public instruction: string,
-    public sourcePosts: string[],
+    public sourcePosts: number[],
     public receiverName: string,
     public receiverProfilePicture: string,
     public receiverHeadline: string,
@@ -27,33 +25,32 @@ export class IcebreakerMessage implements PrimitiveMethod<Payload> {
    * Method to create a IcebreakerMessage instance
    * Apply the conditions to the payload
    */
-  public static of(payload: Payload): Result<IcebreakerMessage, Error> {
-    const parse = conditions.safeParse(payload)
-
+  public static create(payload: Payload): IcebreakerMessage {
+    const payloadAdjusted = AdjustToConditions.apply(payload)
+    const parse = conditions.safeParse(payloadAdjusted)
     if (!parse.success) {
-      const newParse = JSON.parse(JSON.stringify(parse))
-      newParse.domain = `IcebreakerMessage`
-      return Err(new Error(JSON.stringify(newParse)))
+      const creationError = new RuleValidationError(IcebreakerMessage.name, {
+        issues: parse.error.issues,
+      })
+      throw creationError
     }
 
-    return Ok(
-      new IcebreakerMessage(
-        parse.data.message,
-        parse.data.templateTitle,
-        parse.data.templateCategory,
-        parse.data.instruction,
-        parse.data.sourcePosts,
-        parse.data.receiverName,
-        parse.data.receiverProfilePicture,
-        parse.data.receiverHeadline,
-        parse.data.senderName,
-        parse.data.senderProfilePicture,
-        parse.data.senderHeadline,
-      ),
+    return new IcebreakerMessage(
+      parse.data.message,
+      parse.data.templateTitle,
+      parse.data.templateCategory,
+      parse.data.instruction,
+      parse.data.sourcePosts,
+      parse.data.receiverName,
+      parse.data.receiverProfilePicture,
+      parse.data.receiverHeadline,
+      parse.data.senderName,
+      parse.data.senderProfilePicture,
+      parse.data.senderHeadline,
     )
   }
 
-  public toPrimitive(): Payload {
+  public toJSON(): Payload {
     return {
       message: this.message,
       templateTitle: this.templateTitle,

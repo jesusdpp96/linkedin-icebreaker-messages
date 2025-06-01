@@ -1,12 +1,10 @@
-import type { Result } from 'ts-results'
-import { Err, Ok } from 'ts-results'
-import type { PrimitiveMethod } from '../../base'
-import { conditions } from './conditions'
+import { RuleValidationError, type ToJsonMethod } from '../../base'
+import { AdjustToConditions, conditions } from './conditions'
 import type { Payload } from './payload'
 
-export class SenderComment implements PrimitiveMethod<Payload> {
+export class SenderComment implements ToJsonMethod<Payload> {
   /**
-   * Only can be created by the static method `of`
+   * Only can be created by the static method `create`
    */
   private constructor(
     public id: number,
@@ -21,27 +19,28 @@ export class SenderComment implements PrimitiveMethod<Payload> {
    * Method to create a SenderComment instance
    * Apply the conditions to the payload
    */
-  public static of(payload: Payload): Result<SenderComment, Error> {
-    const parse = conditions.safeParse(payload)
+  public static create(payload: Payload): SenderComment {
+    const adjustedPayload = AdjustToConditions.apply(payload)
+    const parse = conditions.safeParse(adjustedPayload)
 
     if (!parse.success) {
-      const newParse = JSON.parse(JSON.stringify(parse))
-      newParse.domain = `SenderComment`
-      return Err(new Error(JSON.stringify(newParse)))
+      const creationError = new RuleValidationError(SenderComment.name, {
+        issues: parse.error.issues,
+      })
+
+      throw creationError
     }
 
-    return Ok(
-      new SenderComment(
-        parse.data.id,
-        parse.data.commentedContent,
-        parse.data.commentedInPublicationUrl,
-        parse.data.commentDate,
-        parse.data.authorUsername,
-      ),
+    return new SenderComment(
+      parse.data.id,
+      parse.data.commentedContent,
+      parse.data.commentedInPublicationUrl,
+      parse.data.commentDate,
+      parse.data.authorUsername,
     )
   }
 
-  public toPrimitive(): Payload {
+  public toJSON(): Payload {
     return {
       id: this.id,
       commentedContent: this.commentedContent,

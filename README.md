@@ -70,7 +70,7 @@ npm install
 3. run server
 
 ```bash
-npm run dev
+npm run express-api:dev
 ```
 Server will run on port 3001 by default. You can change the port in the `.env` file.
 

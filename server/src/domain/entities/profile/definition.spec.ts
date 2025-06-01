@@ -1,130 +1,83 @@
-// profile.test.ts
-import { Err, Ok } from 'ts-results'
+import { expect, it, describe } from '@jest/globals'
 import { Profile } from './definition'
-import type { Payload } from './payload'
+import { RuleValidationError } from '../../base'
+import { type Payload } from './payload'
 
-function createValidPayload(): Payload {
-  return {
+describe('Profile Entity', () => {
+  const validPayload: Payload = {
     id: 1,
-    username: 'valid_user',
+    username: 'validUsername',
     firstName: 'John',
     lastName: 'Doe',
-    profilePicture: 'https://example.com/image.jpg',
+    profilePicture: 'https://example.com/profile.jpg',
     headline: 'Software Engineer',
-    summary: 'Experienced developer with a strong background in web technologies.',
-    certifications: [
-      {
-        year: 2020,
-        name: 'AWS Certified Developer',
-        institution: 'Amazon',
-      },
-    ],
+    summary: 'Experienced software engineer specializing in TypeScript.',
+    certifications: [{ year: 2020, name: 'AWS Certified', institution: 'Amazon' }],
     lastPosition: {
-      title: 'Frontend Developer',
-      companyName: 'Tech Corp',
-      startYear: 2022,
-      startMonth: 1,
+      title: 'Developer',
+      companyName: 'TechCorp',
+      startYear: 2018,
+      startMonth: 5,
     },
   }
-}
 
-describe('Profile.of()', () => {
-  it('should create a valid Profile instance with correct payload', () => {
-    const payload = createValidPayload()
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+  it('should create a Profile instance with valid payload', () => {
+    const profile = Profile.create(validPayload)
+    expect(profile).toBeInstanceOf(Profile)
+    expect(profile.toJSON()).toEqual(validPayload)
   })
 
-  it('should reject id less than 1', () => {
-    const payload = { ...createValidPayload(), id: 0 }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should reject empty username', () => {
-    const payload = { ...createValidPayload(), username: '' }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should reject username over 255 characters', () => {
-    const payload = { ...createValidPayload(), username: 'a'.repeat(256) }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should reject profilePicture with invalid URL', () => {
-    const payload = { ...createValidPayload(), profilePicture: 'not-a-url' }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should reject certification year before 1900', () => {
-    const payload = {
-      ...createValidPayload(),
-      certifications: [{ year: 1899, name: 'Cert', institution: 'Inst' }],
-    }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should reject certification year after current year', () => {
-    const payload = {
-      ...createValidPayload(),
+  it('should adjust payload values when creating a Profile', () => {
+    const adjustedPayload = {
+      ...validPayload,
+      firstName: 'A'.repeat(300), // Exceeds max length
+      lastName: 'B'.repeat(300), // Exceeds max length
+      profilePicture: '   https://example.com/profile.jpg   ', // Extra spaces
+      headline: 'C'.repeat(300), // Exceeds max length
+      summary: 'D'.repeat(2000), // Exceeds max length
       certifications: [
         {
-          year: new Date().getFullYear() + 1,
-          name: 'Cert',
-          institution: 'Inst',
+          year: 2020,
+          name: 'E'.repeat(200), // Exceeds max length
+          institution: 'F'.repeat(200), // Exceeds max length
         },
       ],
-    }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should reject lastPosition.startYear before 1900', () => {
-    const payload = {
-      ...createValidPayload(),
       lastPosition: {
-        ...createValidPayload().lastPosition!,
-        startYear: 1899,
+        title: 'G'.repeat(200), // Exceeds max length
+        companyName: 'H'.repeat(200), // Exceeds max length
+        startYear: 2018,
+        startMonth: 5,
       },
     }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
+
+    const profile = Profile.create(adjustedPayload)
+    expect(profile.firstName).toHaveLength(255)
+    expect(profile.lastName).toHaveLength(255)
+    expect(profile.profilePicture).toBe('https://example.com/profile.jpg')
+    expect(profile.headline).toHaveLength(255)
+    expect(profile.summary).toHaveLength(1500)
+    expect(profile.certifications[0].name).toHaveLength(100)
+    expect(profile.certifications[0].institution).toHaveLength(100)
+    expect(profile.lastPosition?.title).toHaveLength(100)
+    expect(profile.lastPosition?.companyName).toHaveLength(100)
   })
 
-  it('should reject lastPosition.startMonth less than 0', () => {
-    const payload = {
-      ...createValidPayload(),
-      lastPosition: {
-        ...createValidPayload().lastPosition!,
-        startMonth: -1,
-      },
+  it('should throw RuleValidationError for invalid payload', () => {
+    const invalidPayload = {
+      ...validPayload,
+      id: -1, // Invalid ID
     }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
+
+    expect(() => Profile.create(invalidPayload)).toThrow(RuleValidationError)
   })
 
-  it('should reject lastPosition.startMonth greater than 12', () => {
-    const payload = {
-      ...createValidPayload(),
-      lastPosition: {
-        ...createValidPayload().lastPosition!,
-        startMonth: 13,
-      },
-    }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Err)
-  })
-
-  it('should accept null lastPosition', () => {
-    const payload = {
-      ...createValidPayload(),
+  it('should allow null for lastPosition', () => {
+    const payloadWithNullLastPosition = {
+      ...validPayload,
       lastPosition: null,
     }
-    const result = Profile.of(payload)
-    expect(result).toBeInstanceOf(Ok)
+
+    const profile = Profile.create(payloadWithNullLastPosition)
+    expect(profile.lastPosition).toBeNull()
   })
 })

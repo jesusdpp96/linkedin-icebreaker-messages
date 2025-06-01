@@ -1,20 +1,9 @@
 const errorMessages: { [key: string]: string } = {
   bad_request:
     "Esta ingresando datos incorrectos. Por favor, revise la información y vuelva a intentarlo. Revise los enlaces de LinkedIn.",
-  sender_profile:
-    "No se pudo obtener el perfil del remitente. Por favor, revise el enlace de LinkedIn del remitente.",
-  receiver_profile:
-    "No se pudo obtener el perfil del destinatario. Por favor, revise el enlace de LinkedIn del destinatario.",
-  sender_posts:
-    "No se pudo obtener datos del perfil del remitente. Vuelva a intentarlo.",
-  receiver_posts:
-    "No se pudo obtener datos del perfil del destinatario. Vuelva a intentarlo.",
-  sender_comments:
-    "No se pudo obtener datos del perfil del remitente. Vuelva a intentarlo.",
-  receiver_reactions:
-    "No se pudo obtener datos del perfil del destinatario. Vuelva a intentarlo.",
-  messages_template:
-    "Parece que la herramienta tiene problemas con su configuración. Por favor, contacte a soporte.",
+  domain: "No se pudo procesar la solicitud. Intenténtelo de nuevo más tarde.",
+  linkedin_issue:
+    "No se pudo obtener los datos de LinkedIn. Por favor, revise los enlaces proporcionados.",
   ai_response:
     "Parece que la Inteligencia Artificial no está disponible en este momento. Por favor, vuelva a intentarlo más tarde.",
   unexpected_error:
