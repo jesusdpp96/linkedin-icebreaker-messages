@@ -22,4 +22,6 @@ export enum AppError {
   OPEN_AI_UNEXPECTED_ERROR = 'openai-unexpected-error',
   // generic error
   UNEXPECTED_ERROR = 'unexpected-error',
+  // features
+  MISSING_FEATURE_ICEBREAKER_MESSAGES_STRATEGY = 'missing-feature-icebreaker-messages-strategy',
 }

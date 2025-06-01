@@ -34,8 +34,16 @@ router.get('/linkedin-api', async (req: Request, res: Response) => {
 
   switch (type) {
     case 'profile': {
-      const response = await linkedinService.getProfileDataByUrl(url)
-      res.status(200).json({ status: 'success', data: response })
+      try {
+        const response = await linkedinService.getProfileDataByUrl(url)
+        res.status(200).json({ status: 'success', data: response })
+      } catch (error) {
+        res.status(400).json({
+          status: 'error',
+          message: 'Error fetching profile data',
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })
+      }
       return
     }
     case 'reactions': {

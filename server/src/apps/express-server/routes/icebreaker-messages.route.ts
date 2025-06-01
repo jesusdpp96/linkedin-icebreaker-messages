@@ -16,9 +16,6 @@
  *
  * @param {Response} res - The HTTP response object used to send the result back to the client.
  *
- * @throws {Error} missing-linkedin-api-key - Thrown if the LinkedIn API key is not configured.
- * @throws {Error} missing-openai-api-key - Thrown if the OpenAI API key is not configured.
- * @throws {Error} missing-openai-model - Thrown if the OpenAI model is not configured.
  *
  * @returns {void}
  * - On success: Responds with a 200 status and a JSON object containing the generated message.
@@ -57,13 +54,6 @@
  *   ]
  * }
  *
- * // Error response (missing API key)
- * {
- *   "status": "error",
- *   "name": "missing_app_configuration",
- *   "message": "Sorry, the app is not properly configured"
- * }
- *
  * // Error response (unexpected error)
  * {
  *   "status": "error",
@@ -71,102 +61,11 @@
  *   "message": "Sorry, something unexpected went wrong"
  * }
  */
-import type { Request, Response } from 'express'
 import { Router } from 'express'
-import { LinkedInService, MessagesTemplatesDbService, OpenAIChatService } from '@services'
-import {
-  ApiRestResponseDriver,
-  ApisDriver,
-  IcebreakerMessagesController,
-  InRamDbDriver,
-} from '@features/icebreaker-messages-request'
-import { config } from '../config'
-import { AppError, errorMapper } from '../errors'
-import { RequestCounter } from '../utils'
+import { icebreakerMessagesHandler } from '../controllers'
 
 const router = Router()
-const requestCounter = RequestCounter.getInstance('/api/icebreaker-messages')
 
-router.post('/icebreaker-messages', async (req: Request, res: Response) => {
-  const { senderUrl, problemDescription, solutionDescription, receiverUrl } = req.body
-
-  try {
-    /**
-     * Configuriing Services
-     */
-    const linkedinApiKey = config.LINKEDIN_API_KEY
-    const openaiApiKey = config.OPENAI_API_KEY
-    const model = config.OPENAI_MODEL
-    if (!linkedinApiKey) {
-      throw new Error(AppError.MISSING_LINKEDIN_API_KEY)
-    }
-    if (!openaiApiKey) {
-      throw new Error(AppError.MISSING_OPENAI_API_KEY)
-    }
-    if (!model) {
-      throw new Error(AppError.MISSING_OPENAI_MODEL)
-    }
-    const linkedinService = new LinkedInService({ apiKey: linkedinApiKey })
-    const openaiService = new OpenAIChatService({ apiKey: openaiApiKey, model: model })
-    const messagesTemplatesDbService = new MessagesTemplatesDbService()
-    /**
-     * Configuring Drivers
-     */
-    const serviceDriver = new ApisDriver({
-      linkedinService: linkedinService,
-      openaiService: openaiService,
-    })
-    const presenterDriver = new ApiRestResponseDriver()
-    const repositoryDriver = new InRamDbDriver({
-      messagesTemplatesDbService: messagesTemplatesDbService,
-    })
-    /**
-     * Configuring Controller
-     */
-    const controller = new IcebreakerMessagesController(
-      serviceDriver,
-      repositoryDriver,
-      presenterDriver,
-    )
-    /**
-     * Executing use case
-     */
-    await controller.executeImpl({
-      senderLinkedinUrl: senderUrl,
-      problemDescription: problemDescription,
-      solutionDescription: solutionDescription,
-      receiverLinkedinUrl: receiverUrl,
-    })
-    /**
-     * Presenting response
-     */
-    if (presenterDriver.isError) {
-      // present error response
-      res.status(presenterDriver.error?.details.status || 500).send({
-        status: 'error',
-        name: presenterDriver.error?.details.name,
-        message: `${presenterDriver.error?.details.message} - ${presenterDriver.error?.instance.message}`,
-      })
-      return
-    }
-    // update request counter to limit the number of requests (server protection logic)
-    requestCounter.handleRequest()
-    // present success response
-    res.status(200).send({
-      status: 'success',
-      data: presenterDriver.data,
-    })
-    return
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    const errorDetails = errorMapper(err.message)
-    res.status(errorDetails.status).send({
-      status: 'error',
-      name: errorDetails.name,
-      message: `${errorDetails.message} - ${err.message}`,
-    })
-  }
-})
+router.post('/icebreaker-messages', icebreakerMessagesHandler)
 
 export default router
