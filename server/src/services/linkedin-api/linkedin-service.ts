@@ -1,4 +1,4 @@
-import { ExternalServiceError } from 'domain/base'
+import { ExternalServiceError } from '@domain'
 import type { AxiosError } from 'axios'
 import { ApiClient } from './api-client'
 import type {
